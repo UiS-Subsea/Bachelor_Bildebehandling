@@ -30,8 +30,8 @@ def docking_red_center_allign(img_path):
         # print(f"center: [{center}]")
         # print(f"center_of_red koord: [{center_of_red}]")
 
-        diff_x = (center[0] - center_of_red[0]) * (-1) #difference between center of image and center of red dot
-        diff_y = center[1] - center_of_red[1]
+        diff_x = abs(center[0] - center_of_red[0]) #difference between center of image and center of red dot
+        diff_y = abs(center[1] - center_of_red[1])
 
         print(diff_x, diff_y)
         print(red_px_counter)
@@ -40,7 +40,7 @@ def docking_red_center_allign(img_path):
             print("Here code for stop needs to be executed.")
             return "STOP ROV"
 
-        if -10 < center[0] - center_of_red[0] < 10 and -10 < center[1] - center_of_red[1] < 10: #we have found center and can now move forward
+        if -10 < diff_x < 10 and -10 < diff_y < 10: #we have found center and can now move forward
             print("Here code for move forward needs to be executed.")
             return "MOVE FORWARD"
 

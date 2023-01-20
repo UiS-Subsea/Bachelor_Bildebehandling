@@ -30,8 +30,8 @@ def docking_red_center_allign(img_path):
         # print(f"center: [{center}]")
         # print(f"center_of_red koord: [{center_of_red}]")
 
-        diff_x = abs(center[0] - center_of_red[0]) #difference between center of image and center of red dot
-        diff_y = abs(center[1] - center_of_red[1])
+        diff_x = (center[0] - center_of_red[0]) * (-1) #difference between center of image and center of red dot
+        diff_y = center[1] - center_of_red[1]
 
         print(diff_x, diff_y)
         print(red_px_counter)

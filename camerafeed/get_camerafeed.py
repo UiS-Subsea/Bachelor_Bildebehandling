@@ -13,29 +13,29 @@ class CameraFeed:
         return self.camera.isOpened() # Returns a boolean is true if the camera is available
 
     def get_frame_gray(self, frame):
-        return cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        return cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) # Turns frame to grayscale
 
-    def show_frame(self, frame, window_name="frame"):
+    def show_frame(self, frame, window_name="frame"): # Shows the frame in a window
         cv2.imshow(window_name, frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if cv2.waitKey(1) & 0xFF == ord('q'):  # Runs the destructor method if q or 1 is pressed
             self.__del__()
             return False
 
 
-    def __del__(self):
-        self.camera.release()
-        cv2.destroyAllWindows()
+    def __del__(self): # Destructor
+        self.camera.release() # Exits camera
+        cv2.destroyAllWindows() # Exits all cv2 windows
 
 if __name__ == "__main__":
-    cam = CameraFeed()
-    while cam.isOn():
-        while(True):
-            frame = cam.get_frame()
-            gray_frame = cam.get_frame_gray(frame)
-            cam.show_frame(frame, "Normal")
-            cam.show_frame(gray_frame, "Gray")
+    cam = CameraFeed()                                      # Creates a camera object
+    while cam.isOn():                                       # Only run if a camera is available
+        while(True):                                        # Run until q or 1 is pressed
+            frame = cam.get_frame()                         # Gets the frame
+            gray_frame = cam.get_frame_gray(frame)          # Turns the frame to grayscale
+            cam.show_frame(frame, "Normal")                 # Shows the frame
+            cam.show_frame(gray_frame, "Gray")              # Shows the grayscale frame
     else:
-        print("Camera is not available")
+        print("Camera is not available")                    # Prints if no camera is available
 
 
 

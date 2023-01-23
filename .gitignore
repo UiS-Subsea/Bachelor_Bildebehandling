@@ -127,3 +127,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+imageprocessing/__pycache__/docking_red_center_allign.cpython-310.pyc

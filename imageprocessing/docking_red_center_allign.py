@@ -18,7 +18,7 @@ def docking_red_center_allign(img_path):
 
         for x in range(size_x): #loop through axes
             for y in range(size_y):
-                if px[x, y][0] > 180 and px[x, y][1] < 80 and px[x, y][2] < 80: #checks for red color
+                if is_red_color_rgb(px[x, y]):
                     # print(px[x, y])
                     red_px_counter += 1
                     last_red_px = (x, y)
@@ -47,10 +47,14 @@ def docking_red_center_allign(img_path):
         print("This is the amount of pixels the ROV is displaced, and needs to be moved")
         return diff_x, diff_y #returns displacement if nothing else is returned first
 
+def is_red_color_rgb(pix): # Takes in RGB pixel, checks if it's red
+    if pix[0] > 180 and pix[1] < 80 and pix[2] < 80:
+        return True
+    return False
 
 
 if __name__ == "__main__":
-    dock = docking_red_center_allign("images\dockingstation720.png")
+    dock = docking_red_center_allign("imageprocessing\images\dockingstation720.png")
     print(dock)
 
 

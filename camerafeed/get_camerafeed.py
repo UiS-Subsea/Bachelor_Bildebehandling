@@ -1,6 +1,5 @@
 import cv2  #### pip install opencv-python
 
-
 class CameraFeed:
     def __init__(self, camera_id=0):
         self.camera = cv2.VideoCapture(camera_id) # Choose which camera to use
@@ -9,11 +8,8 @@ class CameraFeed:
         ret, frame = self.camera.read() # Ret is a boolean value that returns true if the frame is available, frame is the image
         return frame
 
-    def isOn(self):
+    def is_on(self):
         return self.camera.isOpened() # Returns a boolean is true if the camera is available
-
-    def get_frame_gray(self, frame):
-        return cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) # Turns frame to grayscale
 
     def show_frame(self, frame, window_name="frame"): # Shows the frame in a window
         cv2.imshow(window_name, frame)
@@ -21,17 +17,20 @@ class CameraFeed:
             self.__del__()
             return False
 
-
     def __del__(self): # Destructor
         self.camera.release() # Exits camera
         cv2.destroyAllWindows() # Exits all cv2 windows
 
+
+def frame_to_gray(frame):
+    return cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) # Turns frame to grayscale
+
 if __name__ == "__main__":
     cam = CameraFeed()                                      # Creates a camera object
-    while cam.isOn():                                       # Only run if a camera is available
+    while cam.is_on():                                      # Only run if a camera is available
         while(True):                                        # Run until q or 1 is pressed
             frame = cam.get_frame()                         # Gets the frame
-            gray_frame = cam.get_frame_gray(frame)          # Turns the frame to grayscale
+            gray_frame = frame_to_gray(frame)               # Turns the frame to grayscale
             cam.show_frame(frame, "Normal")                 # Shows the frame
             cam.show_frame(gray_frame, "Gray")              # Shows the grayscale frame
     else:

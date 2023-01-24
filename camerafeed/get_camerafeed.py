@@ -11,6 +11,9 @@ class CameraFeed:
     def is_on(self):
         return self.camera.isOpened() # Returns a boolean is true if the camera is available
 
+    def save_frame(self, frame, filename):
+        cv2.imwrite(filename, frame)
+
     def show_frame(self, frame, window_name="frame"): # Shows the frame in a window
         cv2.imshow(window_name, frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):  # Runs the destructor method if q or 1 is pressed

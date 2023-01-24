@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 image = cv2.imread('froggos.jpg')
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 plt.imshow(gray, cmap='gray')
 
 plt.show()
@@ -18,7 +18,7 @@ plt.show()
 
 #############################
 
-canny = cv2.Canny(blur, 30, 150, 3)
+canny = cv2.Canny(blur, 30, 120, 3)
 plt.imshow(canny, cmap='gray')
 plt.show()
 

@@ -23,9 +23,11 @@ class Test_count_frogs(unittest.TestCase):
     def test_froggos5(self): #vanskeligste testen
         c = count_frogs("froggos/froggos5.png")
         self.assertEqual(c, 6)
+
+    def test_froggos6(self):
+        c = count_frogs("froggos/froggos6.png")
+        self.assertEqual(c, 10)
     
-
-
 
 
 if __name__ == "__main__":

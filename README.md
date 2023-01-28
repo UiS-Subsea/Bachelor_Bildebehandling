@@ -6,15 +6,15 @@ To use the virtual environment:
   
   If windows:
   
-    - source env_name/Scripts/activate
+    source env_name/Scripts/activate
     
-    - pip install -r requirements.txt
+    pip install -r requirements.txt
     
    If Linux:
    
-     - source env/bin/activate
+     source env/bin/activate
      
-     - pip install -r requirements.txt
+     pip install -r requirements.txt
      
  To add modules in the virtual environment do:
   - pip freeze > requirements.txt

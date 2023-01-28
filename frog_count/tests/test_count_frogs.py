@@ -28,9 +28,14 @@ class Test_count_frogs(unittest.TestCase):
         c = count_frogs("froggos/froggos6.png")
         self.assertEqual(c, 11)
 
-    def test_froggos6(self): #den mest realistiske testen
+    def test_froggos7(self): #den vanskeligste testen, grunnet veldig høy oppløsning
         c = count_frogs("froggos/froggos7.png")
         self.assertEqual(c, 9)
+
+    def test_froggos8(self): #den mest realistiske testen
+        c = count_frogs("froggos/froggos8.png")
+        self.assertEqual(c, 9)
+
     
 
 

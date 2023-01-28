@@ -39,5 +39,5 @@ def count_frogs(image_path):
 
 
 if __name__ == "__main__":
-    c = count_frogs('froggos/froggos7.png')
+    c = count_frogs('froggos/froggos8.png')
     print(f"There are {c} frogs")

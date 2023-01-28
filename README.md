@@ -2,12 +2,14 @@
 Bachelor Subsea bildebehandling w/ Filip, Daniel
 
 To use the virtual environment:
+
+Switch to main branch (Just in case), then:
   
-    python -m venv env_name OR python3 -m venv env_name
+    python -m venv env OR python3 -m venv env
   
   If windows:
   
-    source env_name/Scripts/activate
+    source env/Scripts/activate
     
     pip install -r requirements.txt
     

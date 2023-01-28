@@ -2,8 +2,7 @@ from PIL import Image
 
 
 #takes in an image, finds the red dot, finds displacement form center, returns what movement to do, forward, stop, move to side
-#må lage test filer for denne funksjonen!
-def docking_red_center_allign(img_path):
+def autonomous_docking(img_path):
     first_red_px = 0
     last_red_px = 0
     red_px_counter = 0
@@ -26,7 +25,7 @@ def docking_red_center_allign(img_path):
                     if first_red_px == 0:
                         first_red_px = (x, y)
 
-        center_of_red = (round((first_red_px[0] + last_red_px[0]) / 2), round((first_red_px[1] + last_red_px[1]) / 2)) #calculate dead center of red spot
+        center_of_red = (round((first_red_px[0] + last_red_px[0]) / 2), round((first_red_px[1] + last_red_px[1]) / 2)) #calculate center of red spot
         # print(f"center: [{center}]")
         # print(f"center_of_red koord: [{center_of_red}]")
 
@@ -47,14 +46,14 @@ def docking_red_center_allign(img_path):
         print("This is the amount of pixels the ROV is displaced, and needs to be moved")
         return diff_x, diff_y #returns displacement if nothing else is returned first
 
+
 def is_red_color_rgb(pix): # Takes in RGB pixel, checks if it's red
     if pix[0] > 180 and pix[1] < 80 and pix[2] < 80:
         return True
     return False
 
 
+
 if __name__ == "__main__":
-    dock = docking_red_center_allign("imageprocessing\images\dockingstation720.png")
+    dock = autonomous_docking("autonomous_docking\images\dockingstation480.png")
     print(dock)
-
-

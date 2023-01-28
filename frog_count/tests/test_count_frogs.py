@@ -16,16 +16,20 @@ class Test_count_frogs(unittest.TestCase):
         c = count_frogs("froggos/froggos3.jpg")
         self.assertEqual(c, 6)
 
-    def test_froggos4(self): #nest vanskeligste testen
+    def test_froggos4(self): 
         c = count_frogs("froggos/froggos4.jpg")
         self.assertEqual(c, 8)
 
-    def test_froggos5(self): #vanskeligste testen
+    def test_froggos5(self): 
         c = count_frogs("froggos/froggos5.png")
         self.assertEqual(c, 6)
 
     def test_froggos6(self):
         c = count_frogs("froggos/froggos6.png")
+        self.assertEqual(c, 11)
+
+    def test_froggos6(self): #den mest realistiske testen
+        c = count_frogs("froggos/froggos7.png")
         self.assertEqual(c, 11)
     
 

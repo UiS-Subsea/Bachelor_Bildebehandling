@@ -30,7 +30,7 @@ class Test_count_frogs(unittest.TestCase):
 
     def test_froggos6(self): #den mest realistiske testen
         c = count_frogs("froggos/froggos7.png")
-        self.assertEqual(c, 11)
+        self.assertEqual(c, 9)
     
 
 

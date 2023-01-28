@@ -36,6 +36,10 @@ class Test_count_frogs(unittest.TestCase):
         c = count_frogs("froggos/froggos8.png")
         self.assertEqual(c, 9)
 
+    def test_froggos9(self): #den mest realistiske testen
+        c = count_frogs("froggos/froggos9.png")
+        self.assertEqual(c, 3)
+
     
 
 

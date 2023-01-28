@@ -3,7 +3,7 @@ Bachelor Subsea bildebehandling w/ Filip, Daniel
 
 To use the virtual environment:
   
-   python -m venv env_name OR python3 -m venv env_name
+    python -m venv env_name OR python3 -m venv env_name
   
   If windows:
   
@@ -19,5 +19,5 @@ To use the virtual environment:
      
  To add modules in the virtual environment do:
  
-  pip freeze > requirements.txt
+    pip freeze > requirements.txt
     

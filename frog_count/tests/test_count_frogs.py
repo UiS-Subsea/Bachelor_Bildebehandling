@@ -1,5 +1,7 @@
 import unittest
-from count_frogs import *
+import sys
+sys.path.append("..")
+from frog_count.frog_count_func import *
 
 class Test_count_frogs(unittest.TestCase):
     def test_froggos(self):

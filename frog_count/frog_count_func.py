@@ -1,7 +1,5 @@
 # Import libraries
 import cv2
-import numpy as np
-import matplotlib.pyplot as plt
 
 
 def count_frogs(image_path):
@@ -10,8 +8,8 @@ def count_frogs(image_path):
     # gray = cv2.cvtColor(test, cv2.COLOR_RGB2GRAY)
     blur = cv2.GaussianBlur(test, (11, 13), 0)
     canny = cv2.Canny(blur, 50, 120, 13)
-    dilated = cv2.dilate(canny, (1, 1), iterations=8)
-    (cnt, hierarchy) = cv2.findContours(dilated.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    blur2 = cv2.GaussianBlur(canny, (11, 13), 0)
+    (cnt, hierarchy) = cv2.findContours(blur2.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE) #cnt is an array of conoures
     rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     cv2.drawContours(rgb, cnt, -1, (255, 0, 0), 5)
 
@@ -44,5 +42,5 @@ def show_images(image, converted, blur, canny, dilated, contours, t = None):
         plt.show()
 
 if __name__ == "__main__":
-    c = count_frogs('froggos/froggos8.png')
+    c = count_frogs('output.jpg')
     print(f"There are {c} frogs")

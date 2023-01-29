@@ -1,5 +1,6 @@
 # Import libraries
 import cv2
+import matplotlib.pyplot as plt
 
 
 def count_frogs(image_path):

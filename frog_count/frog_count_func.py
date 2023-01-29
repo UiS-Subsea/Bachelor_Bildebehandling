@@ -16,7 +16,7 @@ def count_frogs(image_path):
 
     #########################################################
 
-    # show_images(image, test, blur, canny, dilated, rgb, extra = None)
+    show_images(image, test, blur, canny, dilated, rgb, extra = None)
 
     #########################################################
     # print(len(cnt))
@@ -43,5 +43,5 @@ def show_images(image, converted, blur, canny, dilated, contours, t = None):
         plt.show()
 
 if __name__ == "__main__":
-    c = count_frogs('output.jpg')
+    c = count_frogs('froggos/froggos.jpg')
     print(f"There are {c} frogs")

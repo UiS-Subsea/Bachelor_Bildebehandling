@@ -16,7 +16,7 @@ def count_frogs(image_path):
 
     #########################################################
 
-    show_images(image, test, blur, canny, dilated, rgb, extra = None)
+    show_images(image, test, blur, canny, blur2, rgb, extra = None)
 
     #########################################################
     # print(len(cnt))
@@ -33,7 +33,7 @@ def show_images(image, converted, blur, canny, dilated, contours, t = None):
     axs[1, 0].imshow(canny)
     axs[1, 0].set_title("Canny Edge Detection")
     axs[1, 1].imshow(dilated)
-    axs[1, 1].set_title("Dilated Image")
+    axs[1, 1].set_title("Blur2 Image")
     axs[1, 2].imshow(contours)
     axs[1, 2].set_title("Contours")
     plt.show()

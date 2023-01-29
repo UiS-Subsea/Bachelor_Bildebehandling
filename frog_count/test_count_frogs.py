@@ -1,6 +1,4 @@
 import unittest
-import sys
-sys.path.append("..")
 from frog_count_func import *
 
 class Test_count_frogs(unittest.TestCase):

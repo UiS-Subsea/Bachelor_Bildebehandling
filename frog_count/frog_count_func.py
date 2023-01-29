@@ -1,10 +1,12 @@
 # Import libraries
 import cv2
+import matplotlib.pyplot as plt
 
 
 def count_frogs(image_path):
     image = cv2.imread(image_path)
     test = cv2.cvtColor(image, cv2.COLOR_RGB2HLS_FULL)
+    # gray = cv2.cvtColor(test, cv2.COLOR_RGB2GRAY)
     blur = cv2.GaussianBlur(test, (11, 13), 0)
     canny = cv2.Canny(blur, 50, 120, 13)
     blur2 = cv2.GaussianBlur(canny, (11, 13), 0)
@@ -12,30 +14,34 @@ def count_frogs(image_path):
     rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     cv2.drawContours(rgb, cnt, -1, (255, 0, 0), 5)
 
-    print(len(cnt))
-    cv2.imshow("Image", test)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    #########################################################
 
-    cv2.imshow("Blur", blur)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    show_images(image, test, blur, canny, blur2, rgb)
 
-    cv2.imshow("Canny", canny)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    #########################################################
+    # print(len(cnt))
+    return len(cnt)
 
-    cv2.imshow("Blur2", blur2)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+def show_images(image, converted, blur, canny, blur2, contours, t = None):
+    fig, axs = plt.subplots(2, 3, figsize=(10, 10))
+    axs[0, 0].imshow(image)
+    axs[0, 0].set_title("Original Image")
+    axs[0, 1].imshow(converted)
+    axs[0, 1].set_title("Converted Image")
+    axs[0, 2].imshow(blur)
+    axs[0, 2].set_title("Gaussian Blur")
+    axs[1, 0].imshow(canny)
+    axs[1, 0].set_title("Canny Edge Detection")
+    axs[1, 1].imshow(blur2)
+    axs[1, 1].set_title("Blur2 Image")
+    axs[1, 2].imshow(contours)
+    axs[1, 2].set_title("Contours")
+    plt.show()
 
-    cv2.imshow("Contours", rgb)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    return len(cnt) #return the amount of contoures
-
+    if t is not None:
+        plt.imshow(t)
+        plt.show()
 
 if __name__ == "__main__":
-    c = count_frogs('output.jpg')
+    c = count_frogs('froggos/froggos.jpg')
     print(f"There are {c} frogs")

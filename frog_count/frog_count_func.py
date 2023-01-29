@@ -12,30 +12,30 @@ def count_frogs(image_path):
     rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     cv2.drawContours(rgb, cnt, -1, (255, 0, 0), 5)
 
-    # print(len(cnt))
-    # cv2.imshow("Image", test)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    print(len(cnt))
+    cv2.imshow("Image", test)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
-    # cv2.imshow("Blur", blur)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    cv2.imshow("Blur", blur)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
-    # cv2.imshow("Canny", canny)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    cv2.imshow("Canny", canny)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
-    # cv2.imshow("Blur2", blur2)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    cv2.imshow("Blur2", blur2)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
-    # cv2.imshow("Contours", rgb)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    cv2.imshow("Contours", rgb)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
     return len(cnt) #return the amount of contoures
 
 
 if __name__ == "__main__":
-    c = count_frogs('frog_count/froggos/froggos9.png')
+    c = count_frogs('output.jpg')
     print(f"There are {c} frogs")

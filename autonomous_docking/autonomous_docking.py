@@ -1,5 +1,5 @@
 from PIL import Image
-
+import time
 
 #takes in an image, finds the red dot, finds displacement form center, returns what movement to do, forward, stop, move to side
 def autonomous_docking(img_path):
@@ -7,6 +7,7 @@ def autonomous_docking(img_path):
     last_red_px = 0
     red_px_counter = 0
 
+    start = time.perf_counter()
     with Image.open(img_path) as img:
         new_img = img.convert("RGB") #convert to RGB for more efficiency, stores 3 bytes instead of 4, 25% boost in performance
         size_x, size_y = new_img.size #size of img
@@ -31,6 +32,8 @@ def autonomous_docking(img_path):
 
         diff_x = (center[0] - center_of_red[0]) * (-1) #difference between center of image and center of red dot
         diff_y = center[1] - center_of_red[1]
+        end = time.perf_counter()
+        print(f"time: {start - end}")
 
         print(diff_x, diff_y)
         print(red_px_counter)
@@ -48,12 +51,13 @@ def autonomous_docking(img_path):
 
 
 def is_red_color_rgb(pix): # Takes in RGB pixel, checks if it's red
-    if pix[0] > 180 and pix[1] < 80 and pix[2] < 80:
+    if pix[0] > 160 and pix[1] < 80 and pix[2] < 80:
         return True
     return False
 
 
 
 if __name__ == "__main__":
-    dock = autonomous_docking("autonomous_docking\images\dockingstation480.png")
+
+    dock = autonomous_docking("autonomous_docking\images\dockingstation3.png")
     print(dock)

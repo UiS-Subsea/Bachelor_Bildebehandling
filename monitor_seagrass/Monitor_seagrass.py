@@ -94,7 +94,7 @@ def detect_squares(img_path):
     
     for contour in contours:
         # epsilon value can be tweaked
-        epsilon = 0.015*cv2.arcLength(contour, True)
+        epsilon = 0.03*cv2.arcLength(contour, True)
         # approx is the polygonal approximation of the contour
         approx = cv2.approxPolyDP(contour, epsilon, True)
         cv2.drawContours(dilated, [approx], 0, (0), 3)
@@ -110,11 +110,15 @@ def detect_squares(img_path):
     #cv2.imshow("res", dilated)
     print(squares)
     #cv2.waitKey(0)
-    return squares
+    return squares, dilated
 
 if __name__ == "__main__":
     #picture, amount = calculate_seagrass_percent("Example1_grey.png")
     #print(amount)
     #picture.show()
-    squares = detect_squares("monitor_seagrass\images\Example1.png")
+    squares, img = detect_squares("monitor_seagrass\images\Example1.png")
+    squares2, img2 = detect_squares("monitor_seagrass\images\Example2.png")
+    cv2.imshow("res", img)
+    cv2.imshow("res2", img2)
+    cv2.waitKey(0)
     

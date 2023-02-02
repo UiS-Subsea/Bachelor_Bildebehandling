@@ -1,20 +1,17 @@
 import unittest
+from Monitor_seagrass import *
 
-class TestSquares(unittest.TestCase):
+class test_detect_squares(unittest.TestCase):
+    def test_squares(self):
+        
+        squares1 = detect_squares("monitor_seagrass\images\Example1.png")
+        squares2 = detect_squares("monitor_seagrass\images\Example2.png")
+        self.assertEqual(squares1, 41)
+        self.assertEqual(squares2, 37)
+    
 
-    def test_upper(self):
-        self.assertEqual('foo'.upper(), 'FOO')
 
-    def test_isupper(self):
-        self.assertTrue('FOO'.isupper())
-        self.assertFalse('Foo'.isupper())
-
-    def test_split(self):
-        s = 'hello world'
-        self.assertEqual(s.split(), ['hello', 'world'])
-        # check that s.split fails when the separator is not a string
-        with self.assertRaises(TypeError):
-            s.split(2)
-
-if __name__ == '__main__':
+if __name__ == "__main__":
+    t = test_detect_squares()
     unittest.main()
+        

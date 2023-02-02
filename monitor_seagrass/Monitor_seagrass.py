@@ -75,7 +75,46 @@ def is_grey(px):
         return True
     return False
 
+def detect_squares(img_path):
+    squares = 0
+    
+    img = cv2.imread(img_path)
+    
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    #cv2.imshow("gray", gray)
+    blur = cv2.GaussianBlur(gray, (5, 5), 0)
+    #cv2.imshow("blur", blur)
+    #canny = cv2.Canny(blur, 50, 200)
+    #cv2.imshow("canny", canny)
+    dilated = cv2.dilate(blur, None, iterations=3)
+    #cv2.imshow("dilated", dilated)
+    
+    _, thresh = cv2.threshold(dilated, 127, 255, cv2.THRESH_BINARY)
+    contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    
+    for contour in contours:
+        # epsilon value can be tweaked
+        epsilon = 0.015*cv2.arcLength(contour, True)
+        # approx is the polygonal approximation of the contour
+        approx = cv2.approxPolyDP(contour, epsilon, True)
+        cv2.drawContours(dilated, [approx], 0, (0), 3)
+        
+        if len(approx) == 4: # 4 sides
+            i, j = approx[0][0]
+            # x,y top left corner. w,h width and height
+            x, y, w, h = cv2.boundingRect(contour)
+            ratio = float(w)/h
+            if ratio >= 0.9 and ratio <= 1.1 and w > 20 and h > 20:
+                squares += 1
+                cv2.putText(dilated, 'Square', (i, j), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0))
+    #cv2.imshow("res", dilated)
+    print(squares)
+    #cv2.waitKey(0)
+    return squares
+
 if __name__ == "__main__":
-    picture, amount = calculate_seagrass_percent("Example1_grey.png")
+    #picture, amount = calculate_seagrass_percent("Example1_grey.png")
     #print(amount)
     #picture.show()
+    squares = detect_squares("monitor_seagrass\images\Example1.png")
+    

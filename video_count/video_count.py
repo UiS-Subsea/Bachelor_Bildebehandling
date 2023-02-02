@@ -1,6 +1,7 @@
 import cv2
-from other_funcs import show_images, show_image
+from other_funcs import show_images, show_image, count_frog
 from trackers import EuclideanDistTracker
+import time
 
 
 tracker = EuclideanDistTracker()
@@ -17,7 +18,7 @@ tracker = EuclideanDistTracker()
 
 ###########################################################################################
 
-cap = cv2.VideoCapture("video_count/Froggie2.mp4")
+cap = cv2.VideoCapture("video_count/Froggies3.mp4")
 while cap.isOpened():
     while(True):
         ret, frame = cap.read()
@@ -30,6 +31,8 @@ while cap.isOpened():
             dilated = cv2.dilate(blur2, None, iterations=3)
             (cnt, hierarchy) = cv2.findContours(dilated.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE) #cnt is an array of conoures
             rgb = cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
+        else:
+            break
 
         # cv2.drawContours(rgb, cnt, -1, (0, 255, 0), 2)
 
@@ -47,26 +50,29 @@ while cap.isOpened():
             cv2.putText(rgb, str(id), (x, y-15), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
             cv2.rectangle(rgb, (x, y), (x+w, y+h), (255, 0, 0), 2)
             cv2.imshow("Image", rgb)
-            cv2.imshow("Blur", blur)
-            cv2.imshow("Canny", canny)
-            cv2.imshow("Blur2", blur2)
-            cv2.imshow("Dilated", dilated)
+            # cv2.imshow("Blur", blur)
+            # cv2.imshow("Canny", canny)
+            # cv2.imshow("Blur2", blur2)
+            # cv2.imshow("Dilated", dilated)
+            # show_images(rgb, blur, canny, blur2, dilated)
             id_dict[id] = True
             
-        
-        # key = cv2.waitKey(0)
-        # # cv2.destroyAllWindows()
-        # if key == ord("q"):
-        #     cap.release()
-        #     cv2.destroyAllWindows()
-        #     break
+    
+    # key = cv2.waitKey(0)
+    # # cv2.destroyAllWindows()
+    # if key == ord("q"):
+    #     cap.release()
+    #     cv2.destroyAllWindows()
+    #     break
         if cv2.waitKey(1) & 0xFF == ord('q'):
             cap.release()
             cv2.destroyAllWindows()
             break
+    cap.release()
+    cv2.destroyAllWindows()
 else:
     "Video not opened"
 
-print(f"Number of frogs: {(max(id_dict.keys()) + 1)}")
+print(f"Number of frogs: {(count_frog(id_dict))} \n")
 
 # show_images(real_image, test, blur, canny, blur2, rgb)

@@ -40,10 +40,11 @@ def find_center_of_red(img):
 
 
 if __name__ == "__main__":
-    start = time.perf_counter()
-    img = cv2.imread('autonomous_docking/images/dockingstation2.png')
-    new_img = find_center_of_red(img)
-    end = time.perf_counter()
-    print(start - end)
+    #start = time.perf_counter()
+    img = cv2.imread('autonomous_docking/images/dockingstation_stop.png')
+    red_center, raduius = find_center_of_red(img)
+    print(red_center, raduius)
+    #end = time.perf_counter()
+    # print(start - end)
 
 

@@ -44,9 +44,10 @@ def count_frog(dict):
 
 def find_contours(frame, mode = None):
     if mode is None:
-        test = cv2.cvtColor(frame, cv2.COLOR_RGB2HLS_FULL)
+        frame1 = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        test = cv2.cvtColor(frame1, cv2.COLOR_RGB2HLS_FULL)
         blur = cv2.GaussianBlur(test, (13, 13), 0)
-        canny = cv2.Canny(blur, 50, 120, 13)
+        canny = cv2.Canny(blur, 70, 270, 13)
         blur2 = cv2.GaussianBlur(canny, (11, 13), 0)
         dilated = cv2.dilate(blur2, None, iterations=3)
         (cnt, hierarchy) = cv2.findContours(dilated.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) #cnt is an array of conoures

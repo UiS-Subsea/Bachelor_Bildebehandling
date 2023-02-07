@@ -13,7 +13,7 @@ def autonomous_docking(img_path):
         size_x, size_y = new_img.size #size of img
         center = (size_x // 2, size_y // 2) #exact pixel center as tuple
 
-        print(new_img)
+        #print(new_img)
         px = new_img.load() #load pixel-matrix from image
 
         for x in range(size_x): #loop through axes
@@ -58,6 +58,5 @@ def is_red_color_rgb(pix): # Takes in RGB pixel, checks if it's red
 
 
 if __name__ == "__main__":
-
-    dock = autonomous_docking("autonomous_docking\images\dockingstation3.png")
-    print(dock)
+    dock = autonomous_docking("autonomous_docking\images\dockingstation_stop.png")
+    #print(dock)

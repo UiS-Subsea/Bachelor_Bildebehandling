@@ -1,5 +1,6 @@
 from PIL import Image
 import cv2
+import time
 import numpy as np
 import matplotlib
 from matplotlib.pyplot import imshow
@@ -90,7 +91,9 @@ def detect_squares(img_path):
     #cv2.imshow("dilated", dilated)
     
     _, thresh = cv2.threshold(dilated, 127, 255, cv2.THRESH_BINARY)
-    contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    #cv2.imshow("thresh", thresh)
+    #cv2.waitKey(0)
+    contours, _ = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     
     for contour in contours:
         # epsilon value can be tweaked
@@ -99,16 +102,19 @@ def detect_squares(img_path):
         approx = cv2.approxPolyDP(contour, epsilon, True)
         cv2.drawContours(dilated, [approx], 0, (0), 3)
         
-        if len(approx) == 4: # 4 sides
+        if len(approx) == 4: # 4 sides means a square
             i, j = approx[0][0]
             # x,y top left corner. w,h width and height
             x, y, w, h = cv2.boundingRect(contour)
             ratio = float(w)/h
-            if ratio >= 0.9 and ratio <= 1.1 and w > 20 and h > 20:
+            # how long a square side needs to be in order to be counted, to remove noise
+            noise_threshhold = 20
+            # ratio between 0.9 and 1.1 means a square
+            if  0.9 <= ratio <= 1.1 and w > noise_threshhold < h:
                 squares += 1
                 cv2.putText(dilated, 'Square', (i, j), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0))
+    #print(squares)
     #cv2.imshow("res", dilated)
-    print(squares)
     #cv2.waitKey(0)
     return squares, dilated
 
@@ -116,9 +122,16 @@ if __name__ == "__main__":
     #picture, amount = calculate_seagrass_percent("Example1_grey.png")
     #print(amount)
     #picture.show()
+    tik = time.time()
     squares, img = detect_squares("monitor_seagrass\images\Example1.png")
+    tok = time.time()
+    print("tid brukt1:" + str(round(tok - tik, 4)))
+    tik = time.time()
     squares2, img2 = detect_squares("monitor_seagrass\images\Example2.png")
-    cv2.imshow("res", img)
-    cv2.imshow("res2", img2)
-    cv2.waitKey(0)
+    tok = time.time()
+    print("tid brukt2:" + str(round(tok - tik, 4)))
+    print(squares, squares2)
+    #cv2.imshow("res", img)
+    #cv2.imshow("res2", img2)
+    #cv2.waitKey(0)
     

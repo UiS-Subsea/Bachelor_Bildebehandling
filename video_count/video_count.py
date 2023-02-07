@@ -1,5 +1,5 @@
 import cv2
-from other_funcs import show_images, show_image, count_frog
+from other_funcs import *
 from trackers import EuclideanDistTracker
 import time
 
@@ -23,23 +23,15 @@ while cap.isOpened():
     while(True):
         ret, frame = cap.read()
         if ret:
-            frame1 = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            test = cv2.cvtColor(frame1, cv2.COLOR_RGB2HLS_FULL)
-            blur = cv2.GaussianBlur(test, (13, 13), 0)
-            canny = cv2.Canny(blur, 50, 120, 13)
-            blur2 = cv2.GaussianBlur(canny, (13, 13), 0)
-            dilated = cv2.dilate(blur2, None, iterations=3)
-            (cnt, hierarchy) = cv2.findContours(dilated.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE) #cnt is an array of conoures
-            rgb = cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB)
+            contours = find_contours(frame)
+            rgb = bgr2rgb(frame)
         else:
             break
-
-        # cv2.drawContours(rgb, cnt, -1, (0, 255, 0), 2)
 
     ###########################################################################################
         detections = []
 
-        for countor in cnt:
+        for countor in contours:
             (x, y, w, h) = cv2.boundingRect(countor)
             detections.append([x, y, w, h])
 

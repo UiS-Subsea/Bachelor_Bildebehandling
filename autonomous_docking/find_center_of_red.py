@@ -5,75 +5,39 @@ import time
 
 #takes in an image, isolates the red dot and returns, the center of the red dot and the radius
 def find_center_of_red(img):
-    #creating a mask using threshold over red channel (img[:, :, 2]) <-- 2 signifies red channel
-    #thresholding value is 200, which means all red values over 200 are converted to 255 (white)
-    ret, mask = cv2.threshold(img[:, :,2], 200, 255, cv2.THRESH_BINARY)
+    # cv2.imshow("img", img)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
-    cv2.imshow("mask", mask)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    #create a range for isolating only red
+    #the values in the range may be tweaked for any color or colorvariation
+    low = (0, 0, 0) #lowest end of the range (black)
+    high = (100, 100, 255) #highest end of the range (red)
 
-    #creating a second mask
-    mask2 = np.zeros_like(img)
-    mask2[:, :, 0] = mask #0 = B
-    mask2[:, :, 1] = mask #1 = G
-    mask2[:, :, 2] = mask #2 = R
+    #creating a mask using the inRange() function and the low, high range
+    mask1 = cv2.inRange(img, low, high)
 
-    cv2.imshow("mask2", mask2)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    #using bitwise_and() to convert from mask to actual image format 
+    red_isolated = cv2.bitwise_and(img, img, mask=mask1)
 
-    # extracting `red/ orage` region using `biteise_and`
-    red = cv2.bitwise_and(img, mask2)
-    img = red
-
-    cv2.imshow("red", red)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    #converting to gray
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    cv2.imshow("gray", gray)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    #create mask for gray image
-    ret, thresh = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY)
-
-    cv2.imshow("thresh", thresh)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    #mask for gray image, is converted to zero where there is 255, in other words from white to black
-    img[thresh == 255] = 0 
-    #now all but the red center is filtered and converted into black
-
-    cv2.imshow("img", img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    #blur the image to reduce noise 
-    blurred = cv2.GaussianBlur(img, (11, 13), 0)
-
-    cv2.imshow("blurred", blurred)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # cv2.imshow("red_isolated", red_isolated)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
     #use canny edge detection to find the edges of the red circle
-    canny = cv2.Canny(blurred, 70, 120, 13)
+    #input 2 and 3 specify min and max Val for detecting edge, though using different-
+    #values dont seem to have much effect
+    canny = cv2.Canny(red_isolated, 100, 200)
 
-    cv2.imshow("canny", canny)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    #use findContours to get a list of all contoures
-    (cnt, hierarchy) = cv2.findContours(canny.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    cv2.drawContours(img, cnt, -1, (255, 0, 0), 5)
-
-    cv2.imshow("cnt", img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    #use findContours to get a list of all contoures represented as cnt
+    #cv2.RETR_EXTERNAL (retrieve external) means contour of the outside of object
+    #cv2.CHAIN_APPROX_SIMPLE means the contour is defined by a simple chain of point and not every single point-
+    #to save performance
+    (cnt, hierarchy) = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # cv2.drawContours(red_isolated, cnt, -1, (255, 0, 0), 7)
+    # cv2.imshow("contour", red_isolated)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
     #there may be a lot of noise in the image, to find the correct contoure, we loop through the list of contoures (cnt)
     red_center = (0, 0), 0 #used as variable to find the largest contoure
@@ -86,18 +50,25 @@ def find_center_of_red(img):
     radius = int(red_center[1])
     cv2.circle(img, center, radius, (0, 255, 0), 2)
 
-    cv2.imshow("circle", img)
+    cv2.imshow("canny", canny)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+    # cv2.imshow("orange", img)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
     return center, radius #center is a tuple of two integers: (x, y), raduis is just an integer
 
 
 
 if __name__ == "__main__":
+    #start = time.perf_counter()
+
     img = cv2.imread('autonomous_docking/images/docking_1080p.png')
     red_center, raduius = find_center_of_red(img)
+
+    #end = time.perf_counter()
+    # print(start - end)
+
     print(red_center, raduius)
-    
-
-

@@ -25,8 +25,21 @@ def red_frame_area_percentage(red_radius, frame_width, frame_height):
 #takes in a displacement as a tuple (width, height) as x, y axis and size of red circle as radius
 #returns regulation movement to move ROV back on course
 #TODO: ADD LOGIC FOR REGULATION HERE
-def regulate_position(displacement_x, displacement_y, radius):
-    return "REGULATE"
+def regulate_position(displacement_x, displacement_y):
+    drive_command = ""
+    if displacement_x > 10:
+        drive_command = "GO LEFT"
+    
+    elif displacement_x < -10:
+        drive_command = "GO RIGHT"
+
+    elif displacement_y > 10:
+        drive_command = "GO DOWN"
+
+    elif displacement_y < -10:
+        drive_command = "GO UP"
+        
+    return drive_command
 
 
 #function for stopping ROV

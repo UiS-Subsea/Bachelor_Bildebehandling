@@ -5,10 +5,6 @@ import time
 
 #takes in an image, isolates the red dot and returns, the center of the red dot and the radius
 def find_center_of_red(img):
-    # cv2.imshow("img", img)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
-
     #create a range for isolating only red
     #the values in the range may be tweaked for any color or colorvariation
     low = (0, 0, 0) #lowest end of the range (black)
@@ -43,11 +39,15 @@ def find_center_of_red(img):
     radius = int(red_center[1])
     cv2.circle(img, center, radius, (0, 255, 0), 2)
 
+    cv2.imshow("img", img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
     return center, radius #center is a tuple of two integers: (x, y), raduis is just an integer
 
 
 
 if __name__ == "__main__":
-    img = cv2.imread('autonomous_docking/images/docking_1080p.png')
+    img = cv2.imread('autonomous_docking/images/red_testing.png')
     red_center, raduius = find_center_of_red(img)
     print(red_center, raduius)

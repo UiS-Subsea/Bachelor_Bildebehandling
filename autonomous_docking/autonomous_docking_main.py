@@ -17,10 +17,10 @@ def autonomous_docking(frame):
     if center_area_differance > 30:
         s = stop_rov()
         print(s)
-        return
+        return s #STOP
 
     else:
-        r = regulate_position(center_diff_width, center_diff_height, red_radius)
+        r = regulate_position(center_diff_width, center_diff_height)
         print(r)
 
 
@@ -41,5 +41,5 @@ def autonomous_docking_loop(video_stream):
 
 if __name__ == "__main__":
     #autonomous_docking("autonomous_docking/images/dockingstation_stop.png")
-    video_stream = cv2.VideoCapture("autonomous_docking/videos/Autodock1.mp4")
+    video_stream = cv2.VideoCapture("autonomous_docking/videos/autodock2.mp4")
     autonomous_docking_loop(video_stream)

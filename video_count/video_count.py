@@ -4,7 +4,6 @@ from trackers import EuclideanDistTracker
 import time
 
 
-tracker = EuclideanDistTracker()
 ###########################################################################################
 
 # image = cv2.imread("video_count/froggos4.jpg")
@@ -18,53 +17,67 @@ tracker = EuclideanDistTracker()
 
 ###########################################################################################
 
-cap = cv2.VideoCapture("video_count/Froggies3.mp4")
-while cap.isOpened():
-    while(True):
-        ret, frame = cap.read()
-        if ret:
-            contours, img1, img2, img3, img4= find_contours(frame, 2)
-            rgb = bgr2rgb(frame)
-        else:
-            break
 
-    ###########################################################################################
-        detections = []
+def count_frogs_main(video_stream):
+    tracker = EuclideanDistTracker()
+    while video_stream.isOpened():
+        while(True):
+            ret, frame = video_stream.read()
+            if ret:
+                contours, img1, img2, img3, img4 = find_contours(frame, 2)
+                rgb = bgr2rgb(frame)
+            else:
+                break
 
-        for countor in contours:
-            (x, y, w, h) = cv2.boundingRect(countor)
-            detections.append([x, y, w, h])
+        ###########################################################################################
+            detections = []
 
-        boxes_ids = tracker.update(detections)
-        id_dict = {}
-        for box_id in boxes_ids:
-            x, y, w, h, id = box_id
-            cv2.putText(rgb, str(id), (x, y-15), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-            cv2.rectangle(rgb, (x, y), (x+w, y+h), (255, 0, 0), 2)
-            cv2.imshow("Image", rgb)
-            cv2.imshow("Blur", img1)
-            cv2.imshow("Canny", img2)
-            cv2.imshow("Blur2", img3)
-            cv2.imshow("Dilated", img4)
-            # show_images(rgb, blur, canny, blur2, dilated)
-            id_dict[id] = True
-            
+            for countor in contours:
+                (x, y, w, h) = cv2.boundingRect(countor)
+                detections.append([x, y, w, h])
+
+            boxes_ids = tracker.update(detections)
+            id_dict = {}
+            for box_id in boxes_ids:
+                x, y, w, h, id = box_id
+                cv2.putText(rgb, str(id), (x, y-15), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+                cv2.rectangle(rgb, (x, y), (x+w, y+h), (255, 0, 0), 2)
+                # cv2.imshow("Image", rgb)
+                # cv2.imshow("Blur", img1)
+                # cv2.imshow("Canny", img2)
+                # cv2.imshow("Blur2", img3)
+                # cv2.imshow("Dilated", img4)
+                # show_images(rgb, blur, canny, blur2, dilated)
+                id_dict[id] = True
+                
+        
+        # key = cv2.waitKey(0)
+        # # cv2.destroyAllWindows()
+        # if key == ord("q"):
+        #     cap.release()
+        #     cv2.destroyAllWindows()
+        #     break
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                video_stream.release()
+                cv2.destroyAllWindows()
+                break
+        video_stream.release()
+        cv2.destroyAllWindows()
+    else:
+        "Video not opened"
+
+    print(f"Number of frogs: {(count_frog(id_dict))} \n")
+
+    # show_images(real_image, test, blur, canny, blur2, rgb)
+
+
+
+
+
+
+
+
+if __name__ == "__main__":
+    camera_feed = cv2.VideoCapture("video_count/Froggies3.mp4")
+    c = count_frogs_main(camera_feed)
     
-    # key = cv2.waitKey(0)
-    # # cv2.destroyAllWindows()
-    # if key == ord("q"):
-    #     cap.release()
-    #     cv2.destroyAllWindows()
-    #     break
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            cap.release()
-            cv2.destroyAllWindows()
-            break
-    cap.release()
-    cv2.destroyAllWindows()
-else:
-    "Video not opened"
-
-print(f"Number of frogs: {(count_frog(id_dict))} \n")
-
-# show_images(real_image, test, blur, canny, blur2, rgb)

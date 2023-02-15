@@ -5,6 +5,8 @@ from find_center_of_red import find_center_of_red
 from supporting_functions import *
 
 
+#takes in a frame
+#regulates position or stops based on the computer vision
 def autonomous_docking(frame):
     frame_width = frame.shape[1]
     frame_height = frame.shape[0]
@@ -14,16 +16,18 @@ def autonomous_docking(frame):
     center_diff_width, center_diff_height = differance_between_centers(center_of_frame, center_of_red)
     center_area_differance = red_frame_area_percentage(red_radius, frame_width, frame_height)    
 
+    #checks whether or not it should stop
     if center_area_differance > 30:
         s = stop_rov()
         print(s)
         return s #STOP
 
+    #regulates position of ROV
     else:
         r = regulate_position(center_diff_width, center_diff_height)
         print(r)
 
-
+#takes in videostream
 def autonomous_docking_loop(video_stream):
     teller = 0
     while video_stream.isOpened():
@@ -32,7 +36,7 @@ def autonomous_docking_loop(video_stream):
             if ret:
                 teller += 1
                 print(teller)
-                a = autonomous_docking(frame)
+                a = autonomous_docking(frame) #calls autonomous docking
                 if a == "STOP":
                     return
 

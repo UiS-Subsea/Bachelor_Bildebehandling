@@ -23,7 +23,7 @@ while cap.isOpened():
     while(True):
         ret, frame = cap.read()
         if ret:
-            contours = find_contours(frame)
+            contours, img1, img2, img3, img4= find_contours(frame, 2)
             rgb = bgr2rgb(frame)
         else:
             break
@@ -42,10 +42,10 @@ while cap.isOpened():
             cv2.putText(rgb, str(id), (x, y-15), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
             cv2.rectangle(rgb, (x, y), (x+w, y+h), (255, 0, 0), 2)
             cv2.imshow("Image", rgb)
-            # cv2.imshow("Blur", blur)
-            # cv2.imshow("Canny", canny)
-            # cv2.imshow("Blur2", blur2)
-            # cv2.imshow("Dilated", dilated)
+            cv2.imshow("Blur", img1)
+            cv2.imshow("Canny", img2)
+            cv2.imshow("Blur2", img3)
+            cv2.imshow("Dilated", img4)
             # show_images(rgb, blur, canny, blur2, dilated)
             id_dict[id] = True
             

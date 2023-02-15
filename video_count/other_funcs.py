@@ -42,16 +42,17 @@ def count_frog(dict):
     return max(dict.keys()) + 1 # +1 because the first frog is ID 0
 
 
-def find_contours(frame, mode = None):
-    if mode is None:
+def find_contours(frame, mode = 0):
+    if mode == 0:
         frame1 = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         test = cv2.cvtColor(frame1, cv2.COLOR_RGB2HLS_FULL)
         blur = cv2.GaussianBlur(test, (13, 13), 0)
         canny = cv2.Canny(blur, 70, 270, 13)
         blur2 = cv2.GaussianBlur(canny, (11, 13), 0)
         dilated = cv2.dilate(blur2, None, iterations=3)
-        (cnt, hierarchy) = cv2.findContours(dilated.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) #cnt is an array of conoures
-        return cnt
+        (contours, hierarchy) = cv2.findContours(dilated.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) #cnt is an array of conoures
+
+        return contours, frame1, blur, canny, blur2, dilated
     
     elif mode == 1:
         color_converted = cv2.cvtColor(frame, cv2.COLOR_RGB2HLS_FULL)
@@ -60,7 +61,20 @@ def find_contours(frame, mode = None):
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
         dilated = cv2.dilate(canny, kernel, iterations=1)
         contours, hierarchy = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        return contours
+
+        return contours, color_converted, blur, canny, dilated
+    
+    elif mode == 2:
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        blur = cv2.GaussianBlur(gray, (13, 13), 0)
+        thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+        dilated = cv2.dilate(thresh, kernel, iterations=1)
+        contours, hierarchy = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        return contours, gray, blur, thresh, dilated
+
+    
 
 def bgr2rgb(frame):
     return cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)

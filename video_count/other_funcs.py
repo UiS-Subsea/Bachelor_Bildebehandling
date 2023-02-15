@@ -1,6 +1,7 @@
 from matplotlib import pyplot as plt
 import cv2
 import math
+import numpy as np
 
 def show_images(image1, image2, image3 = None, image4 = None, image5 = None, image6 = None, t = None):
     fig, axs = plt.subplots(2, 3, figsize=(10, 10))
@@ -49,10 +50,10 @@ def find_contours(frame, mode = 0):
         blur = cv2.GaussianBlur(test, (13, 13), 0)
         canny = cv2.Canny(blur, 70, 270, 13)
         blur2 = cv2.GaussianBlur(canny, (11, 13), 0)
-        dilated = cv2.dilate(blur2, None, iterations=3)
+        dilated = cv2.dilate(blur2, None, iterations=7)
         (contours, hierarchy) = cv2.findContours(dilated.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) #cnt is an array of conoures
 
-        return contours, frame1, blur, canny, blur2, dilated
+        return contours
     
     elif mode == 1:
         color_converted = cv2.cvtColor(frame, cv2.COLOR_RGB2HLS_FULL)
@@ -62,7 +63,7 @@ def find_contours(frame, mode = 0):
         dilated = cv2.dilate(canny, kernel, iterations=1)
         contours, hierarchy = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        return contours, color_converted, blur, canny, dilated
+        return contours
     
     elif mode == 2:
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -72,9 +73,7 @@ def find_contours(frame, mode = 0):
         dilated = cv2.dilate(thresh, kernel, iterations=1)
         contours, hierarchy = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        return contours, gray, blur, thresh, dilated
-
-    
+        return contours
 
 def bgr2rgb(frame):
     return cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)

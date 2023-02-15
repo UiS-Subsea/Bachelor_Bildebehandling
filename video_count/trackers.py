@@ -33,19 +33,10 @@ class EuclideanDistTracker:
                 new_center_points[obj_id[4]] = self.center_points[obj_id[4]]
 
         self.center_points = new_center_points.copy()
+        print(objects_bbs_ids)
+        # Objects_bbs_ids will look like  [[x, y, w, h, id], [x, y, w, h, id], [x, y, w, h, id]]
+        # List of all the bounding boxes and their ids of the objects in the frame
         return objects_bbs_ids
 
 
 
-
-
-class CentroidTracker:
-    def __init__(self, maxDisappeared=50):
-        # initialize the next unique object ID along with two ordered
-        # dictionaries used to keep track of mapping a given object
-        # ID to its centroid and number of consecutive frames it has
-        # been marked as "disappeared", respectively
-        self.nextObjectID = 0
-        self.objects = OrderedDict()
-        self.disappeared = OrderedDict()
-        self.maxDisappeared = maxDisappeared

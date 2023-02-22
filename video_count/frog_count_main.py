@@ -5,7 +5,10 @@ import time
 
 def count_frogs_main(video_stream):
     tracker = EuclideanDistTracker()
+    # Initialize a dictionary to store the ID of the frogs
+    id_dict = {}
     while video_stream.isOpened():
+        # print("Is opened")
         while(True):
             frame_available, frame = video_stream.read()
             if frame_available:
@@ -23,8 +26,6 @@ def count_frogs_main(video_stream):
 
             bounding_box_list = tracker.update(detections)
             
-            # Initialize a dictionary to store the ID of the frogs
-            id_dict = {}
             for box in bounding_box_list:
                 x, y, w, h, id = box
                 # Put a text on each box with the ID of the frog, and draw a rectangle around it
@@ -54,12 +55,8 @@ def count_frogs_main(video_stream):
 
 
 
-
-
-
-
-
 if __name__ == "__main__":
-    camera_feed = cv2.VideoCapture("video_count/Media/TestVideo1.mp4")
+    camera_feed = cv2.VideoCapture("video_count\Media\TestVideo1.mp4")
     c = count_frogs_main(camera_feed)
+    print(c)
     

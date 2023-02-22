@@ -33,7 +33,7 @@ class EuclideanDistTracker:
                 new_center_points[obj_id[4]] = self.center_points[obj_id[4]]
 
         self.center_points = new_center_points.copy()
-        print(objects_bbs_ids)
+        # print(objects_bbs_ids)
         # Objects_bbs_ids will look like  [[x, y, w, h, id], [x, y, w, h, id], [x, y, w, h, id]]
         # List of all the bounding boxes and their ids of the objects in the frame
         return objects_bbs_ids

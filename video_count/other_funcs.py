@@ -32,7 +32,12 @@ def show_images(image1, image2, image3 = None, image4 = None, image5 = None, ima
         plt.show()
 
     
+def cv_show_image(image, title):
+    cv2.imshow(title, image)
 
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        cv2.destroyAllWindows()
+            
 
 def show_image(image):
     plt.imshow(image)
@@ -52,7 +57,9 @@ def find_contours(frame, mode = 0):
         blur2 = cv2.GaussianBlur(canny, (11, 13), 0)
         dilated = cv2.dilate(blur2, None, iterations=7)
         (contours, hierarchy) = cv2.findContours(dilated.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) #cnt is an array of conoures
-
+        cv2.imshow("dilated", dilated)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
         return contours
     
     elif mode == 1:

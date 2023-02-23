@@ -45,12 +45,12 @@ def find_contours(frame, mode = 0):
     if mode == 0:
         frame1 = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         test = cv2.cvtColor(frame1, cv2.COLOR_RGB2HLS_FULL)
-        blur = cv2.GaussianBlur(test, (13, 13), 0)
-        canny = cv2.Canny(blur, 70, 270, 13)
+        # blur = cv2.GaussianBlur(test, (13, 13), 0)
+        canny = cv2.Canny(test, 70, 270, 13)
         blur2 = cv2.GaussianBlur(canny, (11, 13), 0)
-        dilated = cv2.dilate(blur2, None, iterations=7)
+        dilated = cv2.dilate(blur2, None, iterations=8)
         (contours, hierarchy) = cv2.findContours(dilated.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) #cnt is an array of conoures
-        return contours, [test, blur, canny, blur2, dilated]
+        return contours, [test, canny, blur2, dilated]
     
     elif mode == 1:
         color_converted = cv2.cvtColor(frame, cv2.COLOR_RGB2HLS_FULL)

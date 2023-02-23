@@ -3,7 +3,7 @@ from other_funcs import *
 from trackers import EuclideanDistTracker
 import time
 
-def count_frogs_main(video_stream):
+def count_frogs_main(video_stream, show_video = False):
     tracker = EuclideanDistTracker()
     # Initialize a dictionary to store the ID of the frogs
     id_dict = {}
@@ -12,7 +12,7 @@ def count_frogs_main(video_stream):
         while(True):
             frame_available, frame = video_stream.read()
             if frame_available:
-                contours = find_contours(frame, 0)
+                contours, view_frames = find_contours(frame, 0)
                 # OpenCV opens frames in BGR, Convert the frame to RGB
                 rgb = bgr2rgb(frame)
             else:
@@ -32,20 +32,17 @@ def count_frogs_main(video_stream):
                 # (x, y-15) means top left of the box, (255,0,0) is the color of the text
                 cv2.putText(rgb, str(id), (x, y-15), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
                 cv2.rectangle(rgb, (x, y), (x+w, y+h), (255, 0, 0), 2)
-                # cv2.imshow("Image", rgb)
-                # cv2.imshow("Blur", img1)
-                # cv2.imshow("Canny", img2)
-                # cv2.imshow("Blur2", img3)
-                # cv2.imshow("Dilated", img4)
-                # show_images(rgb, blur, canny, blur2, dilated)
                 id_dict[id] = True
-                
-        
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                video_stream.release()
-                cv2.destroyAllWindows()
+            if show_video:
+                a,b,c,d,e = unpack(5, view_frames)
+                print(a, b, c, d, e)
                 break
+                
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+        video_stream.release()
         cv2.destroyAllWindows()
+
     else:
         "Video not opened"
 
@@ -57,6 +54,6 @@ def count_frogs_main(video_stream):
 
 if __name__ == "__main__":
     camera_feed = cv2.VideoCapture("video_count\Media\TestVideo1.mp4")
-    c = count_frogs_main(camera_feed)
-    print(c)
+    count = count_frogs_main(camera_feed, show_video = True)
+    print(count)
     

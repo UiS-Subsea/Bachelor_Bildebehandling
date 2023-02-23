@@ -31,13 +31,6 @@ def show_images(image1, image2, image3 = None, image4 = None, image5 = None, ima
         plt.imshow(t)
         plt.show()
 
-    
-def cv_show_image(image, title):
-    cv2.imshow(title, image)
-
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        cv2.destroyAllWindows()
-            
 
 def show_image(image):
     plt.imshow(image)
@@ -57,10 +50,7 @@ def find_contours(frame, mode = 0):
         blur2 = cv2.GaussianBlur(canny, (11, 13), 0)
         dilated = cv2.dilate(blur2, None, iterations=7)
         (contours, hierarchy) = cv2.findContours(dilated.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) #cnt is an array of conoures
-        cv2.imshow("dilated", dilated)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-        return contours
+        return contours, [test, blur, canny, blur2, dilated]
     
     elif mode == 1:
         color_converted = cv2.cvtColor(frame, cv2.COLOR_RGB2HLS_FULL)
@@ -70,7 +60,7 @@ def find_contours(frame, mode = 0):
         dilated = cv2.dilate(canny, kernel, iterations=1)
         contours, hierarchy = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        return contours
+        return contours, [color_converted, blur, canny, dilated]
     
     elif mode == 2:
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -80,7 +70,24 @@ def find_contours(frame, mode = 0):
         dilated = cv2.dilate(thresh, kernel, iterations=1)
         contours, hierarchy = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        return contours
+        return contours, [gray, blur, thresh, dilated]
 
 def bgr2rgb(frame):
     return cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+
+def unpack(n, seq):
+    it = iter(seq)
+    for _ in range(n - 1):
+        yield next(it, None)
+    yield tuple(it)
+
+
+
+if __name__ == "__main__":
+    print("This is a module, not a program")
+    print("Please import this module and use its functions")
+    print("For example: from other_funcs import show_images")
+    print("For example: from other_funcs import count_frog")
+    print("For example: from other_funcs import find_contours")
+    print("For example: from other_funcs import bgr2rgb")

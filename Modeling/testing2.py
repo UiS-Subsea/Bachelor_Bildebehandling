@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import cv2
 from model_functions import *
 
-image_dir = 'Modeling/Images/'
+image_dir = 'Modeling//Images/'
 images = [f for f in os.listdir(image_dir) if f.endswith('.jpg')]
 
 

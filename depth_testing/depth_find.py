@@ -14,8 +14,12 @@ def find_depth(center_left, center_right, frame_left, frame_right, baseline, foc
 
     x_right = center_right[0] #x_koordinate value
     x_left = center_left[0] #x_koordinate value
+    y_right = center_left[1]
+    y_left = center_left[1]
 
-    disparity = x_left - x_right
-    zDepth = (baseline * f_pixel) / disparity
+    disparity_x = x_left - x_right
+    disparity_y = y_left - y_right
+    total_disparity = np.sqrt((disparity_x ** 2) + (disparity_y ** 2)) #if the two cameras are not properly alligned, this handles that problem
+    zDepth = (baseline * f_pixel) / total_disparity
 
     return abs(zDepth)

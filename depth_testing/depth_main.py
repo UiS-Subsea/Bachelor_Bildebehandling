@@ -20,8 +20,8 @@ def find_depth_main(image1, image2):
 
 
 if __name__ == "__main__":
-    img_left = cv2.imread('depth_testing/125cm_test1_1080.png')
-    img_right  = cv2.imread('depth_testing/125cm_test2_1080.png')
+    img_left = cv2.imread('depth_testing/93cm_test1_1080.png')
+    img_right  = cv2.imread('depth_testing/93cm_test2_1080.png')
     print(find_depth_main(img_left, img_right))
 
 

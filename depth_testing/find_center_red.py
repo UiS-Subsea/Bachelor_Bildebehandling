@@ -17,15 +17,13 @@ def find_center_of_red(img):
 
     dilated = cv2.dilate(mask1, None, iterations=10)
 
-    blurred2 = cv2.GaussianBlur(dilated, (11, 13), 0)
-
     #using bitwise_and() to convert from mask to actual image format 
-    red_isolated = cv2.bitwise_and(img, img, mask=blurred2)
+    red_isolated = cv2.bitwise_and(img, img, mask=dilated)
 
     #use canny edge detection to find the edges of the red circle
     #input 2 and 3 specify min and max Val for detecting edge, though using different-
     #values dont seem to have much effect
-    canny = cv2.Canny(red_isolated, 100, 200)
+    canny = cv2.Canny(red_isolated, 30, 100)
 
     #use findContours to get a list of all contoures represented as cnt
     #cv2.RETR_EXTERNAL (retrieve external) means contour of the outside of object
@@ -47,7 +45,7 @@ def find_center_of_red(img):
     cv2.circle(img, center, radius, (0, 255, 0), 2)
     print(center, radius)
 
-    cv2.imshow("blurred2", blurred2)
+    cv2.imshow("dilated", dilated)
     cv2.imshow("img", img)
     cv2.imshow("canny", canny)
     cv2.waitKey(0)

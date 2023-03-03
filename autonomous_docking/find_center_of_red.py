@@ -7,14 +7,18 @@ import time
 def find_center_of_red(img):
     #create a range for isolating only red
     #the values in the range may be tweaked for any color or colorvariation
-    low = (0, 0, 0) #lowest end of the range (black)
-    high = (100, 100, 255) #highest end of the range (red)
+    low = (10, 10, 70) #lowest end of the range (black)
+    high = (70, 40, 255) #highest end of the range (red)
+
+    blurred = cv2.GaussianBlur(img, (11, 13), 0) #remove details from image
 
     #creating a mask using the inRange() function and the low, high range
-    mask1 = cv2.inRange(img, low, high)
+    mask1 = cv2.inRange(blurred, low, high)
+
+    dilated = cv2.dilate(mask1, None, iterations=6)
 
     #using bitwise_and() to convert from mask to actual image format 
-    red_isolated = cv2.bitwise_and(img, img, mask=mask1)
+    red_isolated = cv2.bitwise_and(img, img, mask=dilated)
 
     #use canny edge detection to find the edges of the red circle
     #input 2 and 3 specify min and max Val for detecting edge, though using different-
@@ -39,6 +43,9 @@ def find_center_of_red(img):
     radius = int(red_center[1])
     cv2.circle(img, center, radius, (0, 255, 0), 2)
 
+    # cv2.imshow("mask1", mask1)
+    # cv2.imshow("red_isolated", red_isolated)
+    cv2.imshow("Canny", canny)
     cv2.imshow("img", img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()

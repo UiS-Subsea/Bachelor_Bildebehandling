@@ -13,6 +13,10 @@ def autonomous_docking(frame):
 
     center_of_frame = get_center_of_frame(frame)
     center_of_red, red_radius = find_center_of_red(frame)
+    if center_of_red == (0, 0) and red_radius == 0: #center = (0, 0) and r = 0 are default values, meaning no red conture is found
+        print("No docking station found!")
+        return "No docking station found!"
+
     center_diff_width, center_diff_height = differance_between_centers(center_of_frame, center_of_red)
     center_area_differance = red_frame_area_percentage(red_radius, frame_width, frame_height)    
 
@@ -21,7 +25,6 @@ def autonomous_docking(frame):
         s = stop_rov()
         print(s)
         return s #STOP
-
     #regulates position of ROV
     else:
         r = regulate_position(center_diff_width, center_diff_height)
@@ -30,20 +33,21 @@ def autonomous_docking(frame):
 #takes in videostream
 def autonomous_docking_loop(video_stream):
     teller = 0
-    while video_stream.isOpened():
-        while True:
-            ret, frame = video_stream.read()
-            if ret:
-                teller += 1
-                print(teller)
-                a = autonomous_docking(frame) #calls autonomous docking
-                if a == "STOP":
-                    return
-
+    #while video_stream.isOpened():
+    while True:
+        ret, frame = video_stream.read()
+        if ret:
+            teller += 1
+            print(teller)
+            a = autonomous_docking(frame) #calls autonomous docking
+            if a == "STOP":
+                return
 
 
 
 if __name__ == "__main__":
     #autonomous_docking("autonomous_docking/images/dockingstation_stop.png")
-    video_stream = cv2.VideoCapture("autonomous_docking/videos/autodock2.mp4")
+    video_stream = cv2.VideoCapture("autonomous_docking/videos/Pool_test.mp4")
     autonomous_docking_loop(video_stream)
+
+

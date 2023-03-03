@@ -18,7 +18,8 @@ class Camerafeed_Async(AsyncClass):
         # self.task = asyncio.create_task(self.update())
         
     async def update(self):
-        self.ret, self.frame = self.cap.read()
+        ret, frame = self.cap.read()
+        return (ret, frame)
             
     async def show_frame(self):
         cv2.imshow("frame", self.frame)
@@ -30,26 +31,20 @@ class Camerafeed_Async(AsyncClass):
         
 
 async def update_routine(camerafeed):
-    await camerafeed.update()
-    # print(camerafeed.ret)
-    # asyncio.sleep(1)
-    print("Update Routine Done")
+    while True:
+        ret, frame = camerafeed.cap.read()
+        if not ret:
+            print("no frame")
+            continue
+        cv2.imshow("frame", frame)
+        if cv2.waitKey(1) == ord("q"):
+            break
+        await camerafeed.__adel__()
+        await asyncio.sleep(0.01)  
     
-async def show_routine(camerafeed):
-    await camerafeed.show_frame()
-    # asyncio.sleep(2)
-    print("Show Routine Done")
-
 async def main():
     camera = Camerafeed_Async(gstreamer=False)
-    # tasks = [update_routine(camera), show_routine(camera)]
-    # while True:
-    #     await asyncio.gather(*tasks)
-    event_loop = asyncio.get_event_loop()
-    
-    event_loop.create_task(update_routine(camera))
-    event_loop.run_forever()
-    
+    await update_routine(camera)
     
     #
         

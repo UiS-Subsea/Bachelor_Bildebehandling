@@ -40,8 +40,13 @@ class CamerafeedAsync:
     # Start running the camerafeed and collects tasks
     async def start(self):
         self.started = True
-        # tasks = [self.update(), self.show_frame(), self.key_commands()]
-        # await asyncio.gather(*tasks)
+        # Add more tasks here if needed
+        # Task template:
+        #   async def task_name(self):
+        #       while self.started:
+        #           Do stuff
+        #           await asyncio.sleep(0)
+        
         await self.do_tasks(self.update(), self.show_frame(), self.key_commands())
         
     # Run the tasks asynchronously

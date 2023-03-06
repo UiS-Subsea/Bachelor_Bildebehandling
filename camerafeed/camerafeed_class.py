@@ -2,8 +2,14 @@ import asyncio
 import cv2
 
 class CamerafeedAsync:
-    def __init__(self) -> None:
-        self.cap = cv2.VideoCapture(0)
+    def __init__(self, gstreamer = False, port = 5000) -> None:
+        if gstreamer:
+            self.port = port
+            gst_feed = f"-v udpsrc multicast-group=224.1.1.1 auto-multicast=true port={self.port} ! application/x-rtp, media=video, clock-rate=90000, encoding-name=H264, payload=96 ! rtph264depay ! h264parse ! decodebin ! videoconvert ! appsink sync=false"
+            self.cap = cv2.VideoCapture(gst_feed, cv2.CAP_GSTREAMER)
+        else:
+            self.cap = cv2.VideoCapture(0)
+            
         self.started = False
         self.grabbed, self.frame = self.cap.read()
     

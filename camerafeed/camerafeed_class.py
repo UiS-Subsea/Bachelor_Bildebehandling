@@ -2,7 +2,7 @@ import asyncio
 import cv2
 
 class CamerafeedAsync:
-    def __init__(self, gstreamer = False, port = 5000) -> None:
+    def __init__(self, gstreamer = False, port = 5000):
         if gstreamer:
             self.port = port
             gst_feed = f"-v udpsrc multicast-group=224.1.1.1 auto-multicast=true port={self.port} ! application/x-rtp, media=video, clock-rate=90000, encoding-name=H264, payload=96 ! rtph264depay ! h264parse ! decodebin ! videoconvert ! appsink sync=false"
@@ -20,9 +20,9 @@ class CamerafeedAsync:
             await asyncio.sleep(0)
             
     # Task to show the frame
-    async def show_frame(self):
+    async def show_frame(self, name):
         while self.started:
-            cv2.imshow("frame", self.frame)
+            cv2.imshow(name, self.frame)
             await asyncio.sleep(0)
     
     # Returns frame if needed (Not used)
@@ -36,7 +36,7 @@ class CamerafeedAsync:
         while self.started:
             key = cv2.waitKey(1)
             if key == ord('s'):
-                cv2.imwrite("camerafeed//output//img3.jpg", self.frame)
+                cv2.imwrite(f"camerafeed//output//img{self.port}.jpg", self.frame)
             elif key == ord('q'):
                 self.started = False
                 del self
@@ -53,7 +53,7 @@ class CamerafeedAsync:
         #           Do stuff
         #           await asyncio.sleep(0)
         
-        await self.do_tasks(self.update(), self.show_frame(), self.key_commands())
+        await self.do_tasks(self.update(), self.show_frame(f"{self.port}"), self.key_commands())
         
     # Run the tasks asynchronously
     async def do_tasks(self, *tasks):
@@ -68,9 +68,21 @@ class CamerafeedAsync:
         cv2.destroyAllWindows()
         
 # Main function to run the camerafeed
-async def main():
-    cam = CamerafeedAsync()
-    await cam.start()
+
+async def do_tasks(*tasks):
+    the_tasks = []
+    for task in tasks:
+        the_tasks.append(task)
+    await asyncio.gather(*the_tasks)
+        
+        
+async def main(show_both = False):
+    cam = CamerafeedAsync(gstreamer=True, port=5000)
+    if show_both:
+        cam2 = CamerafeedAsync(gstreamer=True, port=5001)
+        await do_tasks(cam.start(), cam2.start())   
+    else:
+        await cam.start()
         
 if __name__ == "__main__":
     asyncio.run(main())

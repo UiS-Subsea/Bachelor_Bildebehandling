@@ -3,10 +3,10 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 # Load the images
-img1 = cv2.imread('image1.jpg')
-img2 = cv2.imread('image2.jpg')
-img3 = cv2.imread('image3.jpg')
-img4 = cv2.imread('image4.jpg')
+img1 = cv2.imread('3d_testing/Test_Images/Skull1.jpg')
+img2 = cv2.imread('3d_testing/Test_Images/Skull2.jpg')
+img3 = cv2.imread('3d_testing/Test_Images/Skull3.jpg')
+img4 = cv2.imread('3d_testing/Test_Images/Skull4.jpg')
 
 # Convert the images to grayscale
 gray1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
@@ -56,13 +56,31 @@ pts3_3 = np.float32([kp3[m.trainIdx].pt for m in good_matches13]).reshape(-1, 1,
 
 pts1_4 = np.float32([kp1[m.queryIdx].pt for m in good_matches14]).reshape(-1, 1, 2)
 pts4_4 = np.float32([kp4[m.trainIdx].pt for m in good_matches14]).reshape(-1, 1, 2)
+##########################################################################################
 
+criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+objp = np.zeros((6*7,3), np.float32)
+objp[:,:2] = np.mgrid[0:6,0:7].T.reshape(-1,2)
+objectpoints = []
+imgpoints = []
+image = cv2.imread('3d_testing/Test_Images/chess2.jpg')
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+ret1, corners1 = cv2.findChessboardCorners(gray, (6,7),None)
+print(ret1)
+if ret1:
+    objectpoints.append(objp)
+    corners2 = cv2.cornerSubPix(gray,corners1,(11,11),(-1,-1),criteria)
+    imgpoints.append(corners1)
+    
+ret5, mtx, dist_coeffs, rvecs, tvecs = cv2.calibrateCamera(objectpoints, imgpoints, gray1.shape[::-1], None, None)
+##########################################################################################
 # Estimate the camera matrices and 3D points
-retval, camera_matrix1, dist_coeffs1, camera_matrix2, dist_coeffs2, R, T, E, F = cv2.stereoCalibrate(
+retval, camera_matrix1, dist_coeffs1, camera_matrix2, dist_coeffs2, R, T, E, F = cv2.stereoCalibrate(objectpoints,
     [pts1_2, pts1_3, pts1_4],
     [pts2_2, pts3_3, pts4_4],
-    gray1.shape[::-1]
-)
+    mtx, dist_coeffs, mtx, dist_coeffs, gray1.shape[::-1])
+
 
 points_3d = cv2.triangulatePoints(camera_matrix1, camera_matrix2, pts1_2, pts2_2)
 
@@ -76,5 +94,5 @@ ax.set_xlabel('X')
 ax.set_ylabel('Y')
 ax.set_zlabel('Z')
 
-ax.scatter3D(points_3d_normalized[:, 0], points_3d_normalized[:, 1], points_3d_normalized[:, 2], cmap='Greens')
+ax.scatter3D(points_3d_normalized[:, 0], points_3d_normalized[:,1], points_3d_normalized[:, 2], cmap='Greens')
 plt.show()

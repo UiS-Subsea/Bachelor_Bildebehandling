@@ -35,7 +35,8 @@ for fname in images:
         # Draw and display the corners
         cv2.drawChessboardCorners(img, (6,6), corners2, ret)
         cv2.imshow('img',img)
-        cv2.waitKey(0)
+        if cv2.waitKey(500) & 0xFF == ord('q'):
+            break
 
 cv2.destroyAllWindows()
 

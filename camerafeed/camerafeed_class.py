@@ -3,8 +3,8 @@ import cv2
 
 class CamerafeedAsync:
     def __init__(self, gstreamer = False, port = 5000):
+        self.port = port
         if gstreamer:
-            self.port = port
             gst_feed = f"-v udpsrc multicast-group=224.1.1.1 auto-multicast=true port={self.port} ! application/x-rtp, media=video, clock-rate=90000, encoding-name=H264, payload=96 ! rtph264depay ! h264parse ! decodebin ! videoconvert ! appsink sync=false"
             self.cap = cv2.VideoCapture(gst_feed, cv2.CAP_GSTREAMER)
         else:
@@ -15,6 +15,7 @@ class CamerafeedAsync:
     
     # Task to update the frame
     async def update(self):
+        print(self.cap)
         while self.started:
             self.grabbed, self.frame = self.cap.read()
             await asyncio.sleep(0)
@@ -77,7 +78,7 @@ async def do_tasks(*tasks):
         
         
 async def main(show_both = False):
-    cam = CamerafeedAsync(gstreamer=True, port=5000)
+    cam = CamerafeedAsync(gstreamer=False, port=5000)
     if show_both:
         cam2 = CamerafeedAsync(gstreamer=True, port=5001)
         await do_tasks(cam.start(), cam2.start())   

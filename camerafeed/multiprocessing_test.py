@@ -1,69 +1,66 @@
 import cv2
-import multiprocessing
+import time
+import multiprocessing as mp
+import functools
+import asyncio
 
+global cap
 class CameraFeed:
-    def __init__(self, gstreamer = False, port=5000):
-        self.port = port
-        if gstreamer:
-            gst_feed = f"-v udpsrc multicast-group=224.1.1.1 auto-multicast=true port={self.port} ! application/x-rtp, media=video, clock-rate=90000, encoding-name=H264, payload=96 ! rtph264depay ! h264parse ! decodebin ! videoconvert ! appsink sync=false"
-            self.cap = cv2.VideoCapture(gst_feed, cv2.CAP_GSTREAMER)
-        else:
-            self.cap = cv2.VideoCapture(0)
-            
+    def __init__(self):
+        global cap
+        cap = cv2.VideoCapture(0)
         self.started = False
-        self.grabbed, self.frame = self.cap.read()
+        self.frame = cap.read()[1]
         
-    def update(self, lock):
+    # def init_camera(self):
+    #     global cap
+    #     cap = cv2.VideoCapture(0)
+        
+    async def update_loop(self):
         while self.started:
-            lock.acquire()
-            self.grabbed, self.frame = self.cap.read()
-            lock.release()
-            
-    def show_frame(self, lock):
+            print("Updating (Loop)")
+            self.frame = cap.read()[1]
+            cv2.waitKey(1)
+            # yield frame
+            await asyncio.sleep(0)
+        
+    async def show_frame_loop(self):
         while self.started:
-            lock.acquire()
-            cv2.imshow(f"{self.port}", self.frame)
-            lock.release()
+            print("Showing frame (Loop)")
+            cv2.imshow("Frame", self.frame)
+            # cv2.waitKey(1)
+            await asyncio.sleep(0)
             
-    def read(self):
-        return self.grabbed, self.frame
-    
-    def key_commands(self, lock):
-        while self.started:
-            key = cv2.waitKey(1)
-            if key == ord('s'):
-                cv2.imwrite(f"camerafeed//output//img{self.port}.jpg", self.frame)
-            elif key == ord('q'):
-                self.started = False
-                del self
-                break
+    def update(self):
+        if self.started:
+            print("Updating")
             
-    def start(self):
+    def show_frame(self):
+        if self.started:
+            print("Showing frame")
+            
+    def map_func(self, func):
+        return func()
+        
+    def start_update(self):
+        p1 = mp.Pool(5)
+        p1.apply_async(target=self.update_loop)
+        
+    def start_show_frame(self):
+        p2 = mp.Pool(5)
+        p2.apply_async(target=self.show_frame_loop)
+        
+    async def start(self):
         self.started = True
-        self.start_processes()
+        await asyncio.gather(self.start_update, self.start_show_frame)
         
-        
-    def start_processes(self):
-        lock = multiprocessing.Lock()
-        process1 = multiprocessing.Process(target=self.update, args=(lock,))
-        process2 = multiprocessing.Process(target=self.show_frame, args=(lock,))
-        process3 = multiprocessing.Process(target=self.key_commands, args=(lock,))
-        process1.start()
-        process2.start()
-        process3.start()
-        process1.join()
-        process2.join()
-        process3.join()
-        
-    def __del__(self):
-        self.cap.release()
-        cv2.destroyAllWindows()
-        
-        
-    
-
+async def main():
+    cam = CameraFeed()
+    await cam.start()
     
 
 if __name__ == "__main__":
-    cam = CameraFeed(gstreamer=False)
-    cam.start()
+    asyncio.run(main())
+
+
+    

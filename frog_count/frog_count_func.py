@@ -16,8 +16,9 @@ def count_frogs(image_path):
     dilated = cv2.dilate(canny, None, iterations=3)
     dilated2 = cv2.dilate(blur2, None, iterations=10)
     erode = cv2.erode(dilated2, None, iterations=8)
-    thresh = cv2.threshold(dilated2, 60, 255, cv2.ADAPTIVE_THRESH_MEAN_C)[1]
-    thresh2 = cv2.threshold(dilated2, 60, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C)[1]
+    thresh = cv2.threshold(image[:,:,0], 70, 255, cv2.ADAPTIVE_THRESH_MEAN_C)[1]
+    thresh2 = cv2.threshold(image[:,:,0], 200, 255, cv2.ADAPTIVE_THRESH_MEAN_C)[1]
+    difference = cv2.subtract(thresh, thresh2)
     (contours, _) = cv2.findContours(thresh.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     (contours1, _) = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     (contours2, _) = cv2.findContours(thresh.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -55,23 +56,23 @@ def count_frogs(image_path):
                     frogs += 1
                     
                     cv2.rectangle(rgb5, (x,y), (x+w, y+h), (0, 255, 0), 2)
-                else:
-                    print("Noise1")
-            else:
-                print("Noise2")
-        else:
-            print("Noise3")
+                #else:
+                    #print("Noise1")
+            #else:
+                #print("Noise2")
+        #else:
+            #print("Noise3")
         
     #########################################################
 
-    show_images(rgb4, rgb5, rgb3, thresh2, image, rgb, thresh, dilated2)
+    show_images(difference, rgb5, rgb3, thresh2, image, rgb, thresh, dilated2)
 
     #########################################################
     # print(len(contours))
     return frogs
 
 def show_images(rect, TREE, LIST, canny, image, contours, dilated, dilated2, t = None):
-    fig, axs = plt.subplots(2, 4, figsize=(10, 10))
+    fig, axs = plt.subplots(2, 5, figsize=(10, 10))
     axs[0, 0].imshow(image[:,:,0], cmap="Reds")
     axs[0, 0].set_title("Red")
     axs[0, 1].imshow(TREE)
@@ -88,12 +89,23 @@ def show_images(rect, TREE, LIST, canny, image, contours, dilated, dilated2, t =
     axs[1, 2].set_title("PolyDbApproxContours")
     axs[1, 3].imshow(dilated2)
     axs[1, 3].set_title("Dilated2")
+    axs[0, 4].imshow(canny)
+    axs[0, 4].set_title("thresh2")
+    axs[1, 4].imshow(rect)
+    axs[1, 4].set_title("difference thresh and thresh2")
     plt.show()
 
     if t is not None:
         plt.imshow(t)
         plt.show()
 
+#def mean_squared_error(img1, img2): # difference between two images
+#   h, w = img1.shape
+#   diff = cv2.subtract(img1, img2)
+#   err = np.sum(diff**2)
+#   mean = err/(float(h*w))
+#   return mean
+
 if __name__ == "__main__":
-    c = count_frogs("frog_count/froggos/vann4.jpg")
+    c = count_frogs("frog_count/froggos/vann1.jpg")
     print(f"There are {c} frogs")

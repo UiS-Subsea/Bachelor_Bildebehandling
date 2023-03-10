@@ -38,6 +38,8 @@ def regulate_position(displacement_x, displacement_y):
 
     elif displacement_y < -10:
         drive_command = "GO UP"
+    else:
+        drive_command = "GO FORWARD"
         
     return drive_command
 

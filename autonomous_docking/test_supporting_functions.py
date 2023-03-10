@@ -59,7 +59,22 @@ class Test_red_frame_area_percentage(unittest.TestCase):
 
 
 
+class Test_regulate_position(unittest.TestCase):
+    def test_go_left(self):
+        drive_command = regulate_position(100, 0)
+        self.assertAlmostEqual(drive_command, "GO LEFT")
 
+    def test_go_right(self):
+        drive_command = regulate_position(-100, 0)
+        self.assertEqual(drive_command, "GO RIGHT")
+
+    def test_go_down(self):
+        drive_command = regulate_position(0, 100)
+        self.assertEqual(drive_command, "GO DOWN")
+
+    def test_go_up(self):
+        drive_command = regulate_position(0, -100)
+        self.assertEqual(drive_command, "GO UP")
 
 
 

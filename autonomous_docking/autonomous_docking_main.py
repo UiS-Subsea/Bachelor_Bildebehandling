@@ -18,6 +18,7 @@ def autonomous_docking(frame):
         return "No docking station found!"
 
     center_diff_width, center_diff_height = differance_between_centers(center_of_frame, center_of_red)
+    print(center_diff_width, center_diff_height)
     center_area_differance = red_frame_area_percentage(red_radius, frame_width, frame_height)    
 
     #checks whether or not it should stop
@@ -27,8 +28,9 @@ def autonomous_docking(frame):
         return s #STOP
     #regulates position of ROV
     else:
-        r = regulate_position(center_diff_width, center_diff_height)
-        print(r)
+        docking_command = regulate_position(center_diff_width, center_diff_height)
+        print(docking_command)
+        return docking_command
 
 #takes in videostream
 def autonomous_docking_loop(video_stream):

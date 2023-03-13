@@ -44,11 +44,10 @@ def find_center_of_red(img, low_range=(0, 0, 50), high_range=(30, 30, 100)):
             red_center = (x, y), radius
             the_conture = c
 
-    print(cv2.contourArea(c))
+    print(f"ContourArea: {cv2.contourArea(c)}")
     center = (int(red_center[0][0]), int(red_center[0][1]))
     radius = int(red_center[1])
     cv2.circle(img, center, radius, (0, 255, 0), 2)
-    print(center, radius)
 
     cv2.imshow("dilated", dilated)
     cv2.imshow("img", img)

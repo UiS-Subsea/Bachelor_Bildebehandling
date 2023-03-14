@@ -28,6 +28,6 @@ def show_both(img):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    # show_img(img)
+    show_img(img)
     # show_blacked_img(img)
-    show_both(img)
+    # show_both(img)

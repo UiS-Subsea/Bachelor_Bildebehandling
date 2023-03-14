@@ -1,111 +1,95 @@
 # Import libraries
 import cv2
-import matplotlib.pyplot as plt
-import numpy as np
+import time
+    
+def frogDetectionMain(image, drawImage = False): # Launches the two detection methods
+    rectanglesNoRed = frogDetectionNoRed(image)
+    rectanglesNoGrout = frogDetectionNoGrout(image)
+    allRectangles = rectanglesNoRed + rectanglesNoGrout
+    filteredRectangles = rectangleOverlapFilter(allRectangles)
+    if drawImage:
+        for rect in filteredRectangles:
+            x,y,w,h = rect
+            cv2.rectangle(image, (x,y), (x+w, y+h), (0, 255, 0), 2)
+        cv2.imshow("Image", image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+    return len(filteredRectangles), filteredRectangles
+    
+def frogDetectionNoRed(image): # 
+    thresh = cv2.threshold(image[:,:,0], 70, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C)[1]
+    thresh2 = cv2.threshold(image[:,:,0], 200, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C)[1]
+    difference = cv2.subtract(thresh2, thresh)
+    blur_difference = cv2.GaussianBlur(difference, (41, 41), 0)
+    new_thresh = cv2.threshold(blur_difference, 0, 255, cv2.THRESH_OTSU)[1]
+    contours, _ = cv2.findContours(new_thresh.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    frogRectangles = contourFiltration(contours)
+    return frogRectangles
 
-
-def count_frogs(image_path):
-    frogs = 0
-    image = cv2.imread(image_path)
-    # Manipulate image different ways:
+def frogDetectionNoGrout(image): # Does not detect frogs in dark tile grouts
     hls = cv2.cvtColor(image, cv2.COLOR_RGB2HLS_FULL)
     gray = cv2.cvtColor(hls, cv2.COLOR_RGB2GRAY)
-    blur = cv2.GaussianBlur(hls, (11, 13), 0)
-    canny = cv2.Canny(blur, 50, 120, 13)
-    blur2 = cv2.GaussianBlur(canny, (11, 13), 0)
-    dilated = cv2.dilate(canny, None, iterations=3)
-    dilated2 = cv2.dilate(blur2, None, iterations=10)
-    erode = cv2.erode(dilated2, None, iterations=8)
-    thresh = cv2.threshold(image[:,:,0], 70, 255, cv2.ADAPTIVE_THRESH_MEAN_C)[1]
-    thresh2 = cv2.threshold(image[:,:,0], 200, 255, cv2.ADAPTIVE_THRESH_MEAN_C)[1]
+    thresh = cv2.threshold(gray, 90, 255, cv2.THRESH_OTSU)[1]
+    thresh2 = cv2.threshold(gray, 120, 255, cv2.THRESH_TRIANGLE)[1]
     difference = cv2.subtract(thresh, thresh2)
-    (contours, _) = cv2.findContours(thresh.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    (contours1, _) = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    (contours2, _) = cv2.findContours(thresh.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    rgb = cv2.cvtColor(image.copy(), cv2.COLOR_BGR2RGB)
-    rgb1 = cv2.cvtColor(image.copy(), cv2.COLOR_BGR2RGB)
-    rgb2 = cv2.cvtColor(image.copy(), cv2.COLOR_BGR2RGB)
-    rgb3 = cv2.cvtColor(image.copy(), cv2.COLOR_BGR2RGB)
-    rgb4 = cv2.cvtColor(image.copy(), cv2.COLOR_BGR2RGB)
-    rgb5 = cv2.cvtColor(image.copy(), cv2.COLOR_BGR2RGB)
-    #cv2.drawContours(rgb, contours, -1, (255, 0, 0), 5)
-    cv2.drawContours(rgb1, contours1, -1, (255, 0, 0), 5)
-    cv2.drawContours(rgb2, contours2, -1, (255, 0, 0), 5)
-    cv2.drawContours(rgb3, contours, -1, (255, 0, 0), 5)
-    
-    #########################################################
+    diff_blur = cv2.GaussianBlur(difference, (71, 71), 0)
+    dilate_blur = cv2.dilate(diff_blur, None, iterations=6)
+    newThreshold = cv2.threshold(dilate_blur, 0, 255, cv2.THRESH_OTSU)[1]
+    contours, _ = cv2.findContours(newThreshold.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    frogRectangles = contourFiltration(contours)
+    return frogRectangles
+
+def contourFiltration(contours, epsilonValue = 0.03, noise_threshhold_lower = 40, noise_threshhold_upper = 300): # Finds frogs using various filters
+    frog_rectangles = []
     for contour in contours:
         # epsilon value can be tweaked, higher value allows for larger approximated polygon, more likely to have less sides
-        epsilon = 0.03*cv2.arcLength(contour, True)
+        epsilon = epsilonValue * cv2.arcLength(contour, True)
         # approx is the polygonal approximation of the contour
         approx = cv2.approxPolyDP(contour, epsilon, True)
-        rect = cv2.minAreaRect(contour)
-        box = cv2.boxPoints(rect)
-        box = np.int0(box)
-        cv2.drawContours(rgb4, [box], -1, (255, 0, 0), 5)
-        cv2.drawContours(rgb, [approx], -1, (255, 0, 0), 5)
+        # rect = cv2.minAreaRect(contour)
+        # box = cv2.boxPoints(rect) # Rectangle, not rotated
+        # box = np.int0(box)
         if 10 > len(approx) > 4: # More than 4 sides means its more round than a square, more sides means more circular
             # w,h width and height
-            x, y, w, h = cv2.boundingRect(approx)
+            x, y, w, h = cv2.boundingRect(approx) # Rectangle, rotated
             if 0.7 < w/h < 1.3: # If the width and height are within 20% of each other, it is a square
-                
                 # Noise threshhold to ignore small and large contours, can be tweaked
-                noise_threshhold_lower = 40
-                noise_threshhold_upper = 300
                 if  w > noise_threshhold_lower < h and w < noise_threshhold_upper > h:
-                    frogs += 1
-                    
-                    cv2.rectangle(rgb5, (x,y), (x+w, y+h), (0, 255, 0), 2)
-                #else:
-                    #print("Noise1")
-            #else:
-                #print("Noise2")
-        #else:
-            #print("Noise3")
-        
-    #########################################################
+                    frog_rectangles.append((x,y,w,h))
+    return frog_rectangles
 
-    show_images(difference, rgb5, rgb3, thresh2, image, rgb, thresh, dilated2)
+def rectangleOverlapFilter(rectangles): # Filters out rectangles that overlap O(n^2)
+    if len(rectangles) >= 2:
+        n = 0
+        for rectangle in rectangles:
+            n += 1
+            for index in range(n, len(rectangles)):
+                x,y,w,h = rectangle
+                x2,y2,w2,h2 = rectangles[index]
+                
+                # Checks if rectangles overlap in x and y axis
+                # From https://www.geeksforgeeks.org/find-two-rectangles-overlap/
+                if x + w < x2 or x2 + w2 < x:
+                    continue
+                
+                elif y + h < y2 or y2 + h2 < y:
+                    continue
+                
+                else:
+                    rectangles.pop(index)
+                    break
+            
+    return rectangles
 
-    #########################################################
-    # print(len(contours))
-    return frogs
+def show_images(images):
+    for img in images:
+        cv2.imshow("Image", img)
+        cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
-def show_images(rect, TREE, LIST, canny, image, contours, dilated, dilated2, t = None):
-    fig, axs = plt.subplots(2, 5, figsize=(10, 10))
-    axs[0, 0].imshow(image[:,:,0], cmap="Reds")
-    axs[0, 0].set_title("Red")
-    axs[0, 1].imshow(TREE)
-    axs[0, 1].set_title("FROGS")
-    axs[0, 2].imshow(LIST)
-    axs[0, 2].set_title("RETR_LIST Countours")
-    axs[0, 3].imshow(dilated)
-    axs[0, 3].set_title("threshold")
-    axs[1, 0].imshow(image[:,:,1], cmap="Greens")
-    axs[1, 0].set_title("Green")
-    axs[1, 1].imshow(image[:,:,2], cmap="Blues")
-    axs[1, 1].set_title("Blue")
-    axs[1, 2].imshow(contours)
-    axs[1, 2].set_title("PolyDbApproxContours")
-    axs[1, 3].imshow(dilated2)
-    axs[1, 3].set_title("Dilated2")
-    axs[0, 4].imshow(canny)
-    axs[0, 4].set_title("thresh2")
-    axs[1, 4].imshow(rect)
-    axs[1, 4].set_title("difference thresh and thresh2")
-    plt.show()
-
-    if t is not None:
-        plt.imshow(t)
-        plt.show()
-
-#def mean_squared_error(img1, img2): # difference between two images
-#   h, w = img1.shape
-#   diff = cv2.subtract(img1, img2)
-#   err = np.sum(diff**2)
-#   mean = err/(float(h*w))
-#   return mean
-
-if __name__ == "__main__":
-    c = count_frogs("frog_count/froggos/vann1.jpg")
-    print(f"There are {c} frogs")
+if __name__ == "__main__": 
+    # tik = time.perf_counter()
+    frogs, frogRectangles = frogDetectionMain(cv2.imread("frog_count/froggos/froggos9.png"), True)
+    # tok = time.perf_counter() - tik
+    # print(f"Time: {tok} seconds")
+    print(f"There are {frogs} frogs")

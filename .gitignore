@@ -140,6 +140,7 @@ BachelorEnv/Scripts/python.exe
 BachelorEnv/Scripts/pythonw.exe
 bachelor_environment/Scripts/python.exe
 bachelor_environment/Scripts/pythonw.exe
+bachelor_environment/Scripts/python.exe
 bachelor_environment/Scripts/pip3.exe
 bachelor_environment/Scripts/pip3.10.exe
 bachelor_environment/Scripts/pip3.8.exe

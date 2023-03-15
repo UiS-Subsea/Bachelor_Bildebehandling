@@ -16,7 +16,7 @@ def frogDetectionMain(image, drawImage = False): # Launches the two detection me
         cv2.destroyAllWindows()
     return len(filteredRectangles), filteredRectangles
     
-def frogDetectionNoRed(image): # 
+def frogDetectionNoRed(image): # Does not detect red frogs
     thresh = cv2.threshold(image[:,:,0], 70, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C)[1]
     thresh2 = cv2.threshold(image[:,:,0], 200, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C)[1]
     difference = cv2.subtract(thresh2, thresh)
@@ -81,15 +81,9 @@ def rectangleOverlapFilter(rectangles): # Filters out rectangles that overlap O(
             
     return rectangles
 
-def show_images(images):
-    for img in images:
-        cv2.imshow("Image", img)
-        cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
 if __name__ == "__main__": 
-    # tik = time.perf_counter()
+    tik = time.perf_counter()
     frogs, frogRectangles = frogDetectionMain(cv2.imread("frog_count/froggos/froggos9.png"), True)
-    # tok = time.perf_counter() - tik
-    # print(f"Time: {tok} seconds")
+    tok = time.perf_counter() - tik
+    print(f"Time: {tok} seconds")
     print(f"There are {frogs} frogs")

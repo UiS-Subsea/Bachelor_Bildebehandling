@@ -45,20 +45,21 @@ class CameraFeed:
         else:   
             self.cap = cv2.VideoCapture(0)
             
-        self.videoresult = cv2.VideoWriter('filename.avi', cv2.VideoWriter_fourcc(*'MJPG'),10, (int(self.cap.get(3)), int(self.cap.get(4))))
+        self.videoresult = cv2.VideoWriter(f'{self.name}.avi', cv2.VideoWriter_fourcc(*'MJPG'),30, (int(self.cap.get(3)), int(self.cap.get(4))))
         while self.started:
             self.update()
             self.show_frame()
             key = cv2.waitKey(1)
             if key == ord("q"):
-                self.videoresult.release()
                 self.started = False
                 break
             elif key == ord("s"):
                 cv2.imwrite("test.jpg", self.frame)
             elif key == ord("r"):
                 self.recording = not self.recording
+                print(f"Recording" + self.name)
             elif key == ord("t"):
+                print("Stopped recording" + self.name)
                 self.videoresult.release()
     
             
@@ -66,10 +67,9 @@ def fmap(func):
     return func()
 
 if __name__ == "__main__":
-    # cam = CameraFeed("Cam1", gstreamer=True, port=5000)
-    cam = CameraFeed("Cam1", gstreamer=False)
-    # cam2 = CameraFeed("Cam2", gstreamer=True, port=5001)
-    # cam3 = CameraFeed("Cam3", gstreamer=False)
+    cam = CameraFeed("Cam1", gstreamer=True, port=5000)
+    # cam = CameraFeed("Cam1", gstreamer=False)
+    cam2 = CameraFeed("Cam2", gstreamer=True, port=5001)
     with mp.Pool(2) as p:
-            p.map(fmap, [cam.start])
+            p.map(fmap, [cam.start, cam2.start])
 

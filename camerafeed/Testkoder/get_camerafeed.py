@@ -6,7 +6,7 @@ class CameraFeed:
     def __init__(self, gstreamer= True, multicast_grp=f"244.1.1.1", port=5000):
         if gstreamer:
             # Use GSTREAMER multicast to get the camera feed
-            gst_feed = f"-v udpsrc multicast-group={multicast_grp} auto-multicast=true multicast-iface=eth0 port={port} ! application/x-rtp, media=video, clock-rate=90000, encoding-name=H264, payload=96 ! rtph264depay ! h264parse ! decodebin ! videoconvert ! appsink sync=false"
+            gst_feed= f"-v udpsrc multicast-group=224.1.1.1 auto-multicast=true port={port} ! application/x-rtp, media=video, clock-rate=90000, encoding-name=H264, payload=96 ! rtph264depay ! h264parse ! decodebin ! videoconvert ! appsink sync=false"
             self.camera = cv2.VideoCapture(gst_feed, cv2.CAP_GSTREAMER) 
         else:
             # Use the default camera
@@ -55,7 +55,7 @@ def frame_to_gray(frame):
 if __name__ == "__main__":
     # Creates a camera object
     
-    cam = CameraFeed(gstreamer = False)      
+    cam = CameraFeed(gstreamer = True)      
     cam.start_camera()           
     print("Break Point")
               

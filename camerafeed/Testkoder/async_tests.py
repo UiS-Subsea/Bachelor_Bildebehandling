@@ -2,8 +2,13 @@ import asyncio
 import cv2
 import time
 class CamerafeedAsync:
-    def __init__(self) -> None:
-        self.cap = cv2.VideoCapture(0)
+    def __init__(self,name="Cam1", gstreamer=False, port=5000) -> None:
+        self.name = name
+        if gstreamer:
+            gst_feed = f"-v udpsrc multicast-group=224.1.1.1 auto-multicast=true port={port} ! application/x-rtp, media=video, clock-rate=90000, encoding-name=H264, payload=96 ! rtph264depay ! h264parse ! decodebin ! videoconvert ! appsink sync=false"
+            self.cap = cv2.VideoCapture(gst_feed, cv2.CAP_GSTREAMER)
+        else:
+            self.cap = cv2.VideoCapture(0)
         self.started = False
         self.frame, self.grabbed = self.cap.read()
         self.prev_time = 0
@@ -19,7 +24,9 @@ class CamerafeedAsync:
     async def show_frame(self):
         while self.started:
             cv2.putText(self.frame, str(int(self.fps)), (7, 70), cv2.FONT_HERSHEY_SIMPLEX, 3, (100, 255, 0), 3, cv2.LINE_AA)
-            cv2.imshow("frame", self.frame)
+            if self.name != "Cam1":
+                self.frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
+            cv2.imshow(self.name, self.frame)
             await asyncio.sleep(0)
             
     def read(self):
@@ -53,9 +60,20 @@ class CamerafeedAsync:
         cv2.destroyAllWindows()
         
         
-async def main():
-    cam = CamerafeedAsync()
-    await cam.start()
+async def do_tasks(*tasks):
+    the_tasks = []
+    for task in tasks:
+        the_tasks.append(task)
+    await asyncio.gather(*the_tasks)
+
+
+async def main(show_both = False):
+    cam = CamerafeedAsync(name="Cam1", gstreamer=True, port=5000)
+    if show_both:
+        cam2 = CamerafeedAsync(name="Cam2", gstreamer=True, port=5001)
+        await do_tasks(cam.start(), cam2.start())   
+    else:
+        await cam.start()
         
 if __name__ == "__main__":
     asyncio.run(main())

@@ -1,15 +1,18 @@
 import cv2
 import multiprocessing as mp
+from Other_Classes.autonomous_transect_main import AutonomousTransect
 
 class CameraFeed:
-    def __init__(self, cam_name="Cam1", gstreamer=False, port=5000):
+    def __init__(self, cam_name="Cam1", gstreamer=False, port=5000, mode = None):
         self.name = cam_name
         self.started = False
         self.gstreamer = gstreamer
         self.port = port
         self.frame = None
+        self.mode = mode
         self.timer = cv2.getTickCount()
         self.recording = False
+        self.Transect = AutonomousTransect()
                 
     # Function for returning frame
     def get_frame(self):
@@ -51,6 +54,17 @@ class CameraFeed:
             # Updates the frames and shows them
             self.update()
             self.show_frame()
+            
+            if self.mode == "Docking":
+                # Docking code here
+                # Docking = DockingClass()
+                # Docking.update(self.frame)
+                pass
+            elif self.mode == "Transect":
+                # Transect code here
+                self.Transect.update(self.frame)
+            else:
+                pass
             key = cv2.waitKey(1)
             # Press Q to exit camera
             if key == ord("q"):
@@ -67,6 +81,13 @@ class CameraFeed:
             elif key == ord("t"):
                 print("Stopped recording" + self.name)
                 self.videoresult.release()
+            elif key == ord("1"):
+                print("Switching to Transect")
+                if self.mode == "Transect":
+                    self.mode = None
+                else:
+                    self.mode = "Transect"
+                
     
 # function to send other functions as parameters for processes
 def fmap(func):

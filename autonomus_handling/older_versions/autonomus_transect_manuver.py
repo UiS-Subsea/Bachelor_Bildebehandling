@@ -65,7 +65,7 @@ def autonomus_transect_manuver(imagepath):
         
 
 if __name__ == "__main__":
-    a = autonomus_transect_manuver("autonomus_handling/transect_straight.png")
+    a = autonomus_transect_manuver("autonomus_handling/older_versions/transect_straight.png")
     print(a)
     
 

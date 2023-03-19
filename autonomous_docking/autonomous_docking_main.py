@@ -3,6 +3,7 @@ import numpy
 import time
 from find_center_of_red import find_center_of_red
 from supporting_functions import *
+from find_relative_angle import *
 
 
 
@@ -36,7 +37,37 @@ class AutonomousDocking:
             docking_command = regulate_position(center_diff_width, center_diff_height)
             print(docking_command)
             return docking_command
+        
 
+    def rotation_commands(self, down_frame):
+        angle = find_relative_angle(down_frame)
+        if angle == "SKIP":
+            return "SKIP", angle
+        if angle < -2:
+            # angle = 90 + angle
+            return "ROTATE LEFT", angle
+        
+        elif angle > 2:
+            # angle = 90 - angle
+            return "ROTATE RIGHT", angle
+        
+        else:
+            return "GO FORWARD", angle
+
+
+    def update(self, frame):
+        rotation = self.rotation_commands(frame)
+        if rotation == "GO FORWARD":
+            docking_command = self.autonomous_docking(frame)
+            return docking_command
+
+        elif rotation != "SKIP":
+            return rotation
+        else:
+            return "SKIP"
+
+
+    #ONLY FOR TESTING
     #takes in videostream
     def autonomous_docking_loop(self):
         teller = 0
@@ -46,8 +77,9 @@ class AutonomousDocking:
             if ret:
                 teller += 1
                 print(teller)
-                a = self.autonomous_docking(frame) #calls autonomous docking
-                if a == "STOP":
+                update = self.update(frame)
+                print(update)
+                if update == "STOP":
                     return
 
 

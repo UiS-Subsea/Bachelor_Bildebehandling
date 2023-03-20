@@ -56,8 +56,9 @@ class AutonomousTransect:
                     pipes.append(rect)
 
         cv2.imshow("filtered", frame)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            cv2.destroyAllWindows()
+            
             
         if len(pipes) == 2:
             return pipes
@@ -68,7 +69,7 @@ class AutonomousTransect:
       
         
     def find_dark_blue_contours(self, frame):
-        low_blue_range = (70, 0, 0) #b, g, r
+        low_blue_range = (50, 0, 0) #b, g, r
         high_blue_range = (255, 60, 60)
     
         transect_pipe_mask = cv2.inRange(frame, low_blue_range, high_blue_range)

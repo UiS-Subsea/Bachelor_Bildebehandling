@@ -55,6 +55,6 @@ def find_center_of_red(img):
 
 
 if __name__ == "__main__":
-    img = cv2.imread('autonomous_docking/images/red_testing.png')
+    img = cv2.imread('autonomous_docking/images/pool_test1.png')
     red_center, raduius = find_center_of_red(img)
     print(red_center, raduius)

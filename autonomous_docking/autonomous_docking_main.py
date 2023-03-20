@@ -89,5 +89,3 @@ if __name__ == "__main__":
     video_stream = cv2.VideoCapture("autonomous_docking/videos/Pool_test.mp4")
     autonomous = AutonomousDocking(video_stream)
     autonomous.autonomous_docking_loop()
-
-

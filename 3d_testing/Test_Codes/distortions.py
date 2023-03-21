@@ -13,7 +13,7 @@ objp[:,:2] = np.mgrid[0:6,0:6].T.reshape(-1,2)
 objpoints = [] # 3d point in real world space
 imgpoints = [] # 2d points in image plane.
 
-images = glob.glob("3d_testing//Test_Images//*.jpg")
+images = glob.glob("3d_testing//Chess_images//*.jpg")
 
 for fname in images:
     img = cv2.imread(fname)
@@ -35,11 +35,10 @@ for fname in images:
         # Draw and display the corners
         cv2.drawChessboardCorners(img, (6,6), corners2, ret)
         cv2.imshow('img',img)
-        if cv2.waitKey(500) & 0xFF == ord('q'):
+        if cv2.waitKey(0) & 0xFF == ord('q'):
             break
 
 cv2.destroyAllWindows()
-
 ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1],None,None)
 
 np.savez("3d_testing//calibration.npz", mtx=mtx, dist=dist, rvecs=rvecs, tvecs=tvecs)

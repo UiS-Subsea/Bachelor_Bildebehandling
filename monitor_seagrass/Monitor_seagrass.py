@@ -69,8 +69,7 @@ def calculate_seagrass_percent(img_name): # Takes in image name, returns percent
         
         return test_img, grey_px_count
                     
-                    
-                    
+                                     
 def is_grey(px):
     if 80 < px[0] < 155 and 130 < px[1] < 175 and 130 < px[2] < 205:
         return True
@@ -118,20 +117,102 @@ def detect_squares(img_path):
     #cv2.waitKey(0)
     return squares, dilated
 
+
+
+class SeagrassMonitor:
+    def __init__(self):
+        self.seagrass_before = 0
+        self.seagrass_after = 0
+        
+        self.growth = 0 #if positive number, positive growth, opposite for negative values
+
+
+
+    def detect_squares(self, frame):
+        squares = 0
+        
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        #cv2.imshow("gray", gray)
+        blur = cv2.GaussianBlur(gray, (5, 5), 0) #slight blur
+        #cv2.imshow("blur", blur)
+        #canny = cv2.Canny(blur, 50, 200)
+        #cv2.imshow("canny", canny)
+        dilated = cv2.dilate(blur, None, iterations=3)
+        #cv2.imshow("dilated", dilated)
+        
+        _, thresh = cv2.threshold(dilated, 127, 255, cv2.THRESH_BINARY)
+        #cv2.imshow("thresh", thresh)
+        #cv2.waitKey(0)
+        contours, _ = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        
+        for contour in contours:
+            # epsilon value can be tweaked
+            epsilon = 0.03*cv2.arcLength(contour, True)
+            # approx is the polygonal approximation of the contour
+            approx = cv2.approxPolyDP(contour, epsilon, True)
+            cv2.drawContours(dilated, [approx], 0, (0), 3)
+            
+            if len(approx) == 4: # 4 sides means a square
+                i, j = approx[0][0]
+                # x,y top left corner. w,h width and height
+                x, y, w, h = cv2.boundingRect(contour)
+                ratio = float(w)/h
+                # how long a square side needs to be in order to be counted, to remove noise
+                noise_threshhold = 20
+                # ratio between 0.9 and 1.1 means a square
+                if  0.9 <= ratio <= 1.1 and w > noise_threshhold < h:
+                    squares += 1
+                    cv2.putText(dilated, 'Square', (i, j), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0))
+        #print(squares)
+        #cv2.imshow("res", dilated)
+        #cv2.waitKey(0)
+        return squares
+    
+
+    def update(self, frame=None):
+        if self.seagrass_before == 0:
+            self.seagrass_before = self.detect_squares(frame)
+        elif self.seagrass_after == 0:
+            self.seagrass_after = self.detect_squares(frame)
+        else:
+            self.growth = self.seagrass_after - self.seagrass_before
+            if self.growth > 0:
+                print(self.seagrass_before)
+                print(self.seagrass_after)
+                print("There is positive growth of seagrass")
+                print(f"Percent change: +{round(((self.seagrass_after / self.seagrass_before) - 1) * 100, 2)}%")
+            elif self.growth < 0:
+                print("There is negative growth of seagrass")
+                print(f"Percent change: {round(((self.seagrass_after / self.seagrass_before) - 1) * 100, 2)}%")
+            else:
+                print("There is no change in amount of seagrass")
+                print("Percent change: 0%")
+
+    
+
+
+
 if __name__ == "__main__":
     #picture, amount = calculate_seagrass_percent("Example1_grey.png")
     #print(amount)
     #picture.show()
-    tik = time.time()
-    squares, img = detect_squares("monitor_seagrass\images\Example1.png")
-    tok = time.time()
-    print("tid brukt1:" + str(round(tok - tik, 4)))
-    tik = time.time()
-    squares2, img2 = detect_squares("monitor_seagrass\images\Example2.png")
-    tok = time.time()
-    print("tid brukt2:" + str(round(tok - tik, 4)))
-    print(squares, squares2)
+    # tik = time.time()
+    # squares, img = detect_squares("monitor_seagrass\images\Example1.png")
+    # tok = time.time()
+    # print("tid brukt1:" + str(round(tok - tik, 4)))
+    # tik = time.time()
+    # squares2, img2 = detect_squares("monitor_seagrass\images\Example2.png")
+    # tok = time.time()
+    # print("tid brukt2:" + str(round(tok - tik, 4)))
+    # print(squares, squares2)
     #cv2.imshow("res", img)
     #cv2.imshow("res2", img2)
     #cv2.waitKey(0)
-    
+
+    grass1 = cv2.imread("monitor_seagrass\images\Example1.png")
+    grass2 = cv2.imread("monitor_seagrass\images\Example2.png")
+    seagrass_monitor = SeagrassMonitor()
+    seagrass_monitor.update(grass1)
+    seagrass_monitor.update(grass2)
+    seagrass_monitor.update()
+    print(seagrass_monitor.growth)

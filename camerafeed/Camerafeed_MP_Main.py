@@ -13,6 +13,7 @@ class CameraFeed:
         self.port = port
         self.frame = None
         self.mode = mode
+        self.counter = 0
         self.timer = cv2.getTickCount()
         self.recording = False
         self.Transect = AutonomousTransect()
@@ -92,7 +93,8 @@ class CameraFeed:
                 break
             # Press S to save a frame as image
             elif key == ord("s"):
-                cv2.imwrite("test.jpg", self.frame)
+                self.counter += 1
+                cv2.imwrite(f"{self.name}_{self.counter}.jpg", self.frame)
             # Press R to start recording
             elif key == ord("r"):
                 self.recording = not self.recording
@@ -142,10 +144,10 @@ def run_processes(cpu_count, *args):
         p.map(fmap, processes)
         
 if __name__ == "__main__":
-    # cam = CameraFeed("Cam1", gstreamer=True, port=5003)
-    cam = CameraFeed("Cam1", gstreamer=False)
-    # cam2 = CameraFeed("Cam2", gstreamer=True, port=5001)
+    cam = CameraFeed("Cam1", gstreamer=True, port=5000)
+    # cam = CameraFeed("Cam1", gstreamer=False)
+    cam2 = CameraFeed("Cam2", gstreamer=True, port=5001)
 
     # put more processes here, 5 is the cpu count, everything after will be a process
-    run_processes(5, cam.start, cam.start_executor)
+    run_processes(5, cam.start, cam2.start)
 

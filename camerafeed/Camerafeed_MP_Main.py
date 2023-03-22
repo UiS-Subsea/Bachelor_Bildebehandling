@@ -2,6 +2,8 @@ import cv2
 import multiprocessing as mp
 from Other_Classes.autonomous_transect_main import AutonomousTransect
 from Other_Classes.autonomous_docking_main import find_center_of_red
+from Other_Classes.grass_monitor_main import SeagrassMonitor
+from Different_camerafeed import ExecutionClass
 
 class CameraFeed:
     def __init__(self, cam_name="Cam1", gstreamer=False, port=5000, mode = None):
@@ -14,6 +16,9 @@ class CameraFeed:
         self.timer = cv2.getTickCount()
         self.recording = False
         self.Transect = AutonomousTransect()
+        self.Seagrass = SeagrassMonitor()
+        self.grass_list = []
+        self.Executor = ExecutionClass()
         # self.Docking = Docking()
                 
     # Function for returning frame
@@ -40,6 +45,9 @@ class CameraFeed:
                 cv2.putText(resized, str(int(self.fps)), (7, 70), cv2.FONT_HERSHEY_SIMPLEX, 3, (100, 255, 0), 3, cv2.LINE_AA)
                 cv2.imshow(self.name, resized)
                 
+    def start_executor(self):
+        while True:
+            self.Executor.run(self.frame.copy())
         
     def start(self):
         self.started = True
@@ -67,6 +75,14 @@ class CameraFeed:
             elif self.mode == "Transect":
                 # Transect code here
                 self.Transect.update(self.frame)
+            elif self.mode == "Seagrass":
+                # Seagrass code here
+                for frame in self.grass_list:
+                    self.Seagrass.update(frame)
+                    if self.Seagrass.done:
+                        self.grass_list = []
+                        self.mode = None
+                        self.Seagrass.done = False
             else:
                 pass
             key = cv2.waitKey(1)
@@ -97,8 +113,20 @@ class CameraFeed:
                     self.mode = None
                 else:
                     self.mode = "Docking"
+            elif key == ord("3"):
+                if not self.Seagrass.done:
+                    if len(self.grass_list) == 0:
+                        print("Switching to seagrass, click again to take second image")
+                    else:
+                        print("Saving second image frame")
+                    self.grass_list.append(self.frame.copy())
+                    if len(self.grass_list) == 2:
+                        self.mode = "Seagrass"
+                    else:
+                        self.mode = None
+               
+
                 
-    
 # function to send other functions as parameters for processes
 def fmap(func):
     return func()
@@ -119,5 +147,5 @@ if __name__ == "__main__":
     # cam2 = CameraFeed("Cam2", gstreamer=True, port=5001)
 
     # put more processes here, 5 is the cpu count, everything after will be a process
-    run_processes(5, cam.start)
+    run_processes(5, cam.start, cam.start_executor)
 

@@ -1,49 +1,57 @@
 import cv2
 import numpy as np
 import glob
+from matplotlib import pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
 
 def calibrate_camera(image_folder):
-    image_names = glob.glob("3d_testing//Real_Images")
+    image_names = glob.glob(image_folder)
+    image_names = sorted(image_names)
     image_list = []
     
     for img_name in image_names:
-        img = cv2.imread(img_name)
+        img = cv2.imread(img_name, 1)
         image_list.append(img)
         
-    criteria = (cv2.TERM_CRITERIA_EPS, + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
     
-    rows = 8
-    cols = 8
+    rows = 5
+    cols = 5
+    world_scaling = 1.
     
     objp = np.zeros((rows*cols,3), np.float32)
     objp[:,:2] = np.mgrid[0:rows,0:cols].T.reshape(-1,2)
+    objp = world_scaling* objp
     
-    height, width = image_list[0]
+    width = image_list[0].shape[1]
+    height = image_list[0].shape[0]
     
     imgpoints = []
     objpoints = []
     
     for frame in image_list:
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        
+        # cv2.imshow("Gray", gray)
+        # cv2.waitKey(0)
         ret, corners = cv2.findChessboardCorners(gray, (rows,cols), None)
-        
+        print(corners)
         if ret:
-            conv_size = (11,11)
+            conv_size = (5,5)
             corners = cv2.cornerSubPix(gray, corners, conv_size, (-1,-1), criteria)
             cv2.drawChessboardCorners(frame, (rows, cols), corners, ret)
-            cv2.imshow(frame)
-            cv2.waitKey(0)
+            # cv2.imshow("name", frame)
+            # cv2.waitKey(0)
             
             objpoints.append(objp)
             imgpoints.append(corners)
             
-    ret, cam_matrix, distortion, rota_vector, transform_vector = cv2.calibrateCamera(objpoints, imgpoints, (width, height), None, None)
+    ret, cam_matrix, distortion, rota_vector, translation = cv2.calibrateCamera(objpoints, imgpoints, (width, height), None, None)
     print("Worked: ", ret)
     print("Camera matrix: ", cam_matrix)
     print("Distortion: ", distortion)
     print("Rotation: ", rota_vector)
-    print("Transformation: ", transform_vector)
+    print("Translation: ", translation)
     
     return cam_matrix, distortion
 
@@ -51,6 +59,8 @@ def calibrate_camera(image_folder):
 def stereo_calibration(mtx1, dist1, mtx2, dist2, folder1, folder2):
     images_names1 = glob.glob(folder1)
     images_names2 = glob.glob(folder2)
+    images_names1 = sorted(images_names1)
+    images_names2 = sorted(images_names2)
     
     c1_images = []
     c2_images = []
@@ -63,8 +73,8 @@ def stereo_calibration(mtx1, dist1, mtx2, dist2, folder1, folder2):
         c2_images.append(_img2)
 
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-    rows = 8
-    cols = 8
+    rows = 5
+    cols = 5
     
     world_scaling = 1.
     
@@ -72,7 +82,8 @@ def stereo_calibration(mtx1, dist1, mtx2, dist2, folder1, folder2):
     objp[:,:2] = np.mgrid[0:rows,0:cols].T.reshape(-1,2)
     objp = objp * world_scaling
     
-    height, width = c1_images[0].shape
+    width = c1_images[0].shape[1]
+    height = c1_images[0].shape[0]
     
     
     imgpoints1 = []
@@ -94,26 +105,29 @@ def stereo_calibration(mtx1, dist1, mtx2, dist2, folder1, folder2):
             cv2.drawChessboardCorners(frame1, (rows, cols), corners1, ret1)
             cv2.drawChessboardCorners(frame2, (rows, cols), corners2, ret2)
             
-            cv2.imshow(frame1)
-            cv2.imshow(frame2)
-            cv2.waitKey(0)
+            # cv2.imshow("frame2", frame1)
+            # cv2.imshow("frame3", frame2)
+            # cv2.waitKey(0)
             
             objpoints.append(objp)
             imgpoints1.append(corners1)
             imgpoints2.append(corners2)
     
     stereo_calib_flags = cv2.CALIB_FIX_INTRINSIC
-    ret, cam_matrix, dist, rota, transform, ematrix, fmatrix = cv2.stereoCalibrate(objpoints, imgpoints1, imgpoints2, mtx1, dist1, mtx2, dist2, (width, height), flags=stereo_calib_flags)
+    ret, cam1_matrix, dist1, cam2_matrix, dist2, rota, transform, ematrix, fmatrix = cv2.stereoCalibrate(objpoints, imgpoints1, imgpoints2, mtx1, dist1, mtx2, dist2, (width, height), flags=stereo_calib_flags)
     
     return rota, transform
 
-
-    
-    
-    
+ 
     
     
 if __name__ == "__main__":
-    mtx1, dist1 = calibrate_camera("3d_testing//Stereo1_Pics")
-    mtx2, dist2 = calibrate_camera("3d_testing//Stereo2_Pics")
+    mtx1, dist1 = calibrate_camera("3d_testing/Stereo1_Pics/*")
+    mtx2, dist2 = calibrate_camera("3d_testing/Stereo2_Pics/*")
+    
+    R, T = stereo_calibration(mtx1, dist1, mtx2, dist2, "3d_testing/Stereo1_Pics/*", "3d_testing/Stereo2_Pics/*")
+    
+    
+    triangulate(mtx1, mtx2, R, T)
+    
     

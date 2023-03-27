@@ -12,10 +12,15 @@ class AutonomousTransect:
         self.frame = frame
         self.canStabilize = False
         self.driveCommand = "GO FORWARD"
+        self.driving_data = []
 
     #takes in frame, finds all the contours of objects with dark blue color
     #returns angle between             
     
+    def get_driving_data(self):
+        data = self.driving_data.copy()
+        self.driving_data = []
+        return data
 
     def get_angle_between_pipes(self, pipe1, pipe2):
         angle1 = pipe1[2]
@@ -78,6 +83,7 @@ class AutonomousTransect:
         
         return pipe_contours
     
+    # driving packet: [id, [x, y, z, r, 0, 0, 0, 0]]
     
     def autonomous_transect_maneuver(self, frame):
         pipes = self.find_pipes(frame)
@@ -86,19 +92,25 @@ class AutonomousTransect:
         
         transect_angle = self.get_angle_between_pipes(pipes[0], pipes[1])
         
-        if transect_angle < -5:
+        if transect_angle < -2:
             print("Turn left")
+            driving_packet = [40, [0, 0, 0, -10, 0, 0, 0, 0]]
+            self.driving_data.append(driving_packet)
             # TODO run some function to turn left and stabilize
     
-        elif transect_angle > 5:
+        elif transect_angle > 2:
+            driving_packet = [40, [0, 0, 0, 10, 0, 0, 0, 0]]
+            self.driving_data.append(driving_packet)
             print("Turn right")
             
             # TODO run some function to turn right and stabilize
         else:
             print("Go forward")
             self.canStabilize = True
-            return "GO FORWARD"
-    
+            driving_pakcet = [40, [0, 10, 0, 0, 0, 0, 0, 0]]
+            self.driving_data.append(driving_packet)
+
+
         #call go center function
         
 
@@ -125,13 +137,19 @@ class AutonomousTransect:
             print("Ratio: ", ratio)
             
             if 0.95 > ratio:
+                driving_pakcet = [40, [-10, 0, 0, 0, 0, 0, 0, 0]]
+                self.driving_data.append(driving_pakcet)
                 print("Move to left")
                 
             elif 1.05 < ratio:
                 print("Move to right")
+                driving_pakcet = [40, [10, 0, 0, 0, 0, 0, 0, 0]]
+                self.driving_data.append(driving_pakcet)
                 
             else:
                 print("Go forward")
+                driving_pakcet = [40, [0, 10, 0, 0, 0, 0, 0, 0]]
+                self.driving_data.append(driving_pakcet)
         else:
             print("Can't stabilize yet")
          

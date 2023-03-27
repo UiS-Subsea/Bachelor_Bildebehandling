@@ -20,6 +20,9 @@ class CameraFeed:
         self.Seagrass = SeagrassMonitor()
         self.grass_list = []
         self.Executor = ExecutionClass()
+        # self.network = NetworkHandler()
+        # self.data = []
+        # self.network.send(data)
         # self.Docking = Docking()
                 
     # Function for returning frame

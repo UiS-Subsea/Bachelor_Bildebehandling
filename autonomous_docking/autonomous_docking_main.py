@@ -10,6 +10,13 @@ from find_relative_angle import *
 class AutonomousDocking:
     def __init__(self, video_stream):
         self.video_stream = video_stream
+        self.driving_data = [40, [0, 0, 0, 0, 0, 0, 0, 0]]
+
+
+    def get_driving_data(self):
+        data = self.driving_data.copy()
+        self.driving_data = []
+        return data
 
     #takes in a frame
     #regulates position or stops based on the computer vision
@@ -34,9 +41,9 @@ class AutonomousDocking:
             return s #STOP
         #regulates position of ROV
         else:
-            docking_command = regulate_position(center_diff_width, center_diff_height)
-            print(docking_command)
-            return docking_command
+            self.driving_data = regulate_position(center_diff_width, center_diff_height)
+            print(self.driving_data)
+            return self.driving_data
         
 
     def rotation_commands(self, down_frame):
@@ -45,13 +52,17 @@ class AutonomousDocking:
             return "SKIP", angle
         if angle < -2:
             # angle = 90 + angle
+            self.driving_data = [40, [0, 0, 0, -10, 0, 0, 0, 0]]
             return "ROTATE LEFT", angle
+            
         
         elif angle > 2:
             # angle = 90 - angle
+            self.driving_data = [40, [0, 0, 0, 10, 0, 0, 0, 0]]
             return "ROTATE RIGHT", angle
         
         else:
+            self.driving_data = [40, [0, 10, 0, 0, 0, 0, 0, 0]]
             return "GO FORWARD", angle
 
 

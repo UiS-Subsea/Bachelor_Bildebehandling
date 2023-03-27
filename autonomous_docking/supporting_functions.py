@@ -28,18 +28,23 @@ def red_frame_area_percentage(red_radius, frame_width, frame_height):
 def regulate_position(displacement_x, displacement_y):
     drive_command = ""
     if displacement_x > 10:
-        drive_command = "GO LEFT"
+        #drive_command = "GO LEFT"
+        drive_command = [40, [-10, 0, 0, 0, 0, 0, 0, 0]]
     
     elif displacement_x < -10:
-        drive_command = "GO RIGHT"
+        #drive_command = "GO RIGHT"
+        drive_command = [40, [10, 0, 0, 0, 0, 0, 0, 0]]
 
     elif displacement_y > 10:
-        drive_command = "GO DOWN"
+        #drive_command = "GO DOWN"
+        drive_command = [40, [0, 0, -10, 0, 0, 0, 0, 0]]
 
     elif displacement_y < -10:
-        drive_command = "GO UP"
+        #drive_command = "GO UP"
+        drive_command = [40, [0, 0, 10, 0, 0, 0, 0, 0]]
     else:
-        drive_command = "GO FORWARD"
+        # drive_command = "GO FORWARD"
+        drive_command = [40, [0, 10, 0, 0, 0, 0, 0, 0]]
         
     return drive_command
 

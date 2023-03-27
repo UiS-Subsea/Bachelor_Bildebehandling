@@ -15,7 +15,7 @@ class AutonomousDocking:
 
     def get_driving_data(self):
         data = self.driving_data.copy()
-        self.driving_data = []
+        self.driving_data = [40, [0, 0, 0, 0, 0, 0, 0, 0]]
         return data
 
     #takes in a frame

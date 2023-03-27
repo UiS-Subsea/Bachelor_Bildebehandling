@@ -8,11 +8,11 @@ def color_correct(img):
 
 def process(img):
     _, thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-    plt.imshow(thresh)
+    plt.imshow(color_correct(thresh))
     plt.show()
     
 def triangulate(mtx1,mtx2,R,T):
-    img1 = cv2.imread("3d_testing/Target_Images/Cam1_2.jpg")
+    img1 = cv2.imread("3d_testing/Target_Images/Cam1_2test.jpg")
     img2 = cv2.imread("3d_testing/Target_Images/Cam2_2.jpg")
    
     gray1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
@@ -28,7 +28,7 @@ def triangulate(mtx1,mtx2,R,T):
     gray1 = cv2.GaussianBlur(gray1, (5, 5), 0)
     gray2 = cv2.GaussianBlur(gray2, (5, 5), 0)
     
-    process(color_correct(gray1))
+    process(gray1)
     plt.imshow(color_correct(gray1))
     plt.show()
     
@@ -49,10 +49,10 @@ def triangulate(mtx1,mtx2,R,T):
     # print("BIG TEST VALUE: ", kp1[0].pt)
     bf = cv2.BFMatcher()
     
-    matches = bf.knnMatch(des1, des2, k=3)
+    matches = bf.knnMatch(des1, des2, k=2)
     print("Matches: ", len(matches))
     good_matches = []
-    for m,n, _ in matches:
+    for m,n in matches:
         if m.distance < 0.85*n.distance:
             # print("This is m: ", m," This is n: ", n)
             # print("The query index is: ", m.queryIdx)

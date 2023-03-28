@@ -2,7 +2,20 @@ import cv2
 import numpy as np
 import time
 
-
+class AutonomousDocking:
+    def __init__(self):
+        self.driving_data = [40, [0, 0, 0, 0, 0, 0, 0, 0]]
+        self.frame = None
+        
+    def run(self, frame):
+        self.frame = frame
+        data = self.get_driving_data()
+        return self.frame, data
+        
+    def get_driving_data(self):
+        data = self.driving_data.copy()
+        self.driving_data = [40, [0, 0, 0, 0, 0, 0, 0, 0]]
+        
 #takes in an image, isolates the red dot and returns, the center of the red dot and the radius
 def find_center_of_red(img):
     #create a range for isolating only red

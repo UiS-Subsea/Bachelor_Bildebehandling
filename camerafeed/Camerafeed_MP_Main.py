@@ -3,7 +3,7 @@ import multiprocessing as mp
 from Other_Classes.autonomous_transect_main import AutonomousTransect
 from Other_Classes.autonomous_docking_main import find_center_of_red
 from Other_Classes.grass_monitor_main import SeagrassMonitor
-from Different_camerafeed import ExecutionClass
+# from Different_camerafeed import ExecutionClass
 
 class CameraFeed:
     def __init__(self, cam_name="Cam1", gstreamer=False, port=5000, mode = None):
@@ -19,7 +19,7 @@ class CameraFeed:
         self.Transect = AutonomousTransect()
         self.Seagrass = SeagrassMonitor()
         self.grass_list = []
-        self.Executor = ExecutionClass()
+        # self.Executor = ExecutionClass()
         # self.network = NetworkHandler()
         # self.data = []
         # self.network.send(data)
@@ -49,9 +49,9 @@ class CameraFeed:
                 cv2.putText(resized, str(int(self.fps)), (7, 70), cv2.FONT_HERSHEY_SIMPLEX, 3, (100, 255, 0), 3, cv2.LINE_AA)
                 cv2.imshow(self.name, resized)
                 
-    def start_executor(self):
-        while True:
-            self.Executor.run(self.frame.copy())
+    # def start_executor(self):
+    #     while True:
+    #         self.Executor.run(self.frame.copy())
             
     # def start_gui(self)
         
@@ -81,6 +81,8 @@ class CameraFeed:
             elif self.mode == "Transect":
                 # Transect code here
                 self.Transect.update(self.frame)
+                driving_data = self.Transect.get_driving_data()
+                print(driving_data)
             elif self.mode == "Seagrass":
                 # Seagrass code here
                 for frame in self.grass_list:
@@ -149,10 +151,10 @@ def run_processes(cpu_count, *args):
         p.map(fmap, processes)
         
 if __name__ == "__main__":
-    cam = CameraFeed("Cam1", gstreamer=True, port=5000)
-    # cam = CameraFeed("Cam1", gstreamer=False)
-    cam2 = CameraFeed("Cam2", gstreamer=True, port=5001)
+    # cam = CameraFeed("Cam1", gstreamer=True, port=5000)
+    cam = CameraFeed("Cam1", gstreamer=False)
+    # cam2 = CameraFeed("Cam2", gstreamer=True, port=5001)
 
     # put more processes here, 5 is the cpu count, everything after will be a process
-    run_processes(5, cam.start, cam2.start)
+    run_processes(5, cam.start)
 

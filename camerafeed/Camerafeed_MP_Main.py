@@ -52,6 +52,8 @@ class CameraFeed:
     def start_executor(self):
         while True:
             self.Executor.run(self.frame.copy())
+            
+    # def start_gui(self)
         
     def start(self):
         self.started = True

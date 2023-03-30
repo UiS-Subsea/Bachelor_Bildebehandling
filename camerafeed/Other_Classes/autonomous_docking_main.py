@@ -31,7 +31,7 @@ class AutonomousDocking:
     def __init__(self):
         self.driving_data = [40, [0, 0, 0, 0, 0, 0, 0, 0]]
         self.frame = None
-        self.show_grouts = False
+        self.draw_grouts = False
         self.draw_grout_boxes = False
         
     def run(self, front_frame, down_frame):
@@ -58,9 +58,10 @@ class AutonomousDocking:
         red_isolated = cv2.bitwise_and(self.frame, self.frame, mask=dilated)
         canny = cv2.Canny(red_isolated, 100, 200)
         # use findContours to get a list of all contoures
-        contours = cv2.findContours(canny, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        contours, _ = cv2.findContours(canny, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         # there may be a lot of noise in the image, to find the correct contoure, we loop through the list of contoures
         red_center = (0, 0), 0
+        print(contours)
         for c in contours:
             (x, y), radius = cv2.minEnclosingCircle(c)
             if radius > red_center[1]:
@@ -113,7 +114,7 @@ class AutonomousDocking:
         for c in grout_contours:
             rect = cv2.minAreaRect(c)
             area = cv2.contourArea(c)
-            x, y, width, height, angle = cv2.boundingRect(c)
+            (x, y), (width, height), angle = rect
             
             MAX_AREA = 5000
             MIN_AREA = 500
@@ -157,7 +158,8 @@ class AutonomousDocking:
         
         
 if __name__ == "__main__":
-    # img = cv2.imread('autonomous_docking/images/red_testing.png')
-    # red_center, raduius = find_center_of_red(img)
-    # print(red_center, raduius)
-    pass
+    start = time.perf_counter()
+    a = AutonomousDocking()
+    frame = cv2.imread("camerafeed/Other_Classes/images/transect1.png")
+    a.run(frame, frame.copy())
+    print(time.perf_counter() - start)

@@ -46,7 +46,8 @@ class ExecutionClass:
         cv2.imwrite("camerafeed/output/output_image.jpg", self.frame)
             
     def transect(self, frame):
-        transect_frame, driving_data_packet = self.AutonomousTransect.run(frame.copy())
+        transect_frame, driving_data_packet, frog_counter = self.AutonomousTransect.run(frame.copy())
+        print(frog_counter)
         self.show(transect_frame, "Transect")
         return driving_data_packet
             

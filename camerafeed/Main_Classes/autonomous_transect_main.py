@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import time
+from frog_count_main import FrogCount
 
 # What to tweak for water test:
 # 1. cv2.inRange() lower and upper range
@@ -12,6 +13,7 @@ class AutonomousTransect:
         self.canStabilize = False
         self.driving_data = [40, [0, 0, 0, 0, 0, 0, 0, 0]]
         self.frame = None
+        self.frog_count = FrogCount()
 
     #takes in frame, finds all the contours of objects with dark blue color
     #returns angle between             
@@ -19,7 +21,8 @@ class AutonomousTransect:
         self.frame = frame
         self.update()
         data = self.get_driving_data()
-        return self.frame, data
+        frog_counter = self.frog_count.update(frame)
+        return self.frame, data, frog_counter
         
     def update(self):
         self.autonomous_transect_maneuver()
@@ -149,8 +152,6 @@ class AutonomousTransect:
             # print("Can't stabilize yet")
             pass
          
-
-
 
     
 if __name__ == "__main__":

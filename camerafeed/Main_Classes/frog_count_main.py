@@ -1,17 +1,29 @@
 import cv2
 import time
 
+class Frog:
+    def __init__(self, rectangle):
+        self.detectionCounter = 1
+        self.rectangle = rectangle
+        
+
 class FrogCount:
     def __init__(self):
         self.previous_frogs = [] #List of rectangles
         self.current_frogs = [] #List of rectangles
+        self.currFrogs = []
+        self.prevFrogs = []
         self.frog_counter = 0
+        self.detection_counter_threshold = 10
         
-    def frogDetectionMain(self, image, drawImage = False): # Launches the two detection methods
+        self.check_previous_algo = "BASIC"
+
+    #takes in frame  
+    def update(self, image, drawImage = False): # Launches the two detection methods
         rectanglesNoRed = self.frogDetectionNoRed(image)
         rectanglesNoGrout = self.frogDetectionNoGrout(image)
         allRectangles = rectanglesNoRed + rectanglesNoGrout
-        filteredRectangles = self.rectangleOverlapFilter(allRectangles)
+        filteredRectangles, _ = self.rectangleOverlapFilter(allRectangles)
         if drawImage:
             for rect in filteredRectangles:
                 x,y,w,h = rect
@@ -20,18 +32,44 @@ class FrogCount:
             cv2.waitKey(0)
             cv2.destroyAllWindows()
             
+        
+        for rectangle in filteredRectangles:
+            self.currFrogs.append(Frog(rectangle))
+            
         self.current_frogs = filteredRectangles
         
-        numFrogsDetected = len(self.current_frogs) # 3
-        allFrogs = self.previous_frogs + self.current_frogs # 3
-        numAllFrogs = len(allFrogs) # 3
-        FilteredFrogs = self.rectangleOverlapFilter(allFrogs) # 3
-        numRemovedFrogs = numAllFrogs - len(FilteredFrogs) # 3 - 3 = 0
-        self.frog_counter += numFrogsDetected - numRemovedFrogs # 3 - 0 = 3
+        if self.check_previous_algo == "BASIC":
+            self.checkPreviousFrogsBasic()
+            
+        if self.check_previous_algo == "ADVANCED":
+            self.checkPreviousFrogsAdvanced()
+
+        return self.frog_counter
+    
+    def checkPreviousFrogsBasic(self):
+        numFrogsDetected = len(self.current_frogs)
+        allFrogs = self.previous_frogs + self.current_frogs
+        numAllFrogs = len(allFrogs)
+        FilteredFrogs, _ = self.rectangleOverlapFilter(allFrogs)
+        numRemovedFrogs = numAllFrogs - len(FilteredFrogs)
+        self.frog_counter += numFrogsDetected - numRemovedFrogs
 
         self.previous_frogs = self.current_frogs
+
+    def checkPreviousFrogsAdvanced(self):
+        allFrogs = self.current_frogs + self.previous_frogs
+        _, OverlapPairs = self.rectangleOverlapFilter(allFrogs.copy())
+        for OverlapPair in OverlapPairs:
+            # OverlapPair = touple of two indexes, of rectangles that overlap
+            if allFrogs[OverlapPair[0]].detectionCounter <= allFrogs[OverlapPair[1]].detectionCounter:
+                allFrogs[OverlapPair[0]].detectionCounter = allFrogs[OverlapPair[1]].detectionCounter + 1
+
         
-        return self.frog_counter, self.current_frogs
+        self.prevFrogs = self.allFrogs[0:len(self.currFrogs)]
+        for frog in self.prevFrogs:
+            if frog.detectionCounter == self.detection_counter_threshold:
+                self.frog_counter += 1
+        self.currFrogs = []
         
     def frogDetectionNoRed(self, image):
         thresh = cv2.threshold(image[:,:,0], 70, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C)[1]
@@ -76,6 +114,7 @@ class FrogCount:
         return frog_rectangles
     
     def rectangleOverlapFilter(self, rectangles): # Filters out rectangles that overlap O(n^2)
+        overlappedRectsPairs = []
         if len(rectangles) >= 2:
             n = 0
             for rectangle in rectangles:
@@ -93,10 +132,13 @@ class FrogCount:
                         continue
                     
                     else:
+                        overlappedRectsPairs.append((n, index))
                         rectangles.pop(index)
                         break
                     
-        return rectangles
+        return rectangles, overlappedRectsPairs
+
+
 
 if __name__ == "__main__": 
     # tik = time.perf_counter()
@@ -104,7 +146,7 @@ if __name__ == "__main__":
     frogCount = FrogCount()
     frogCount.previous_frogs = [(48, 711, 164, 196), (407, 360, 49, 48)]
     frogCount.frog_counter = 2
-    frogs = frogCount.frogDetectionMain(frame, True)
+    frogs = frogCount.update(frame, True)
     # tok = time.perf_counter() - tik
     # print(f"Time: {tok} seconds")
     print(f"There are {frogs} frogs")

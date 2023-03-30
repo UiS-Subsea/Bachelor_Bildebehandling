@@ -77,6 +77,9 @@ class FrogCount:
         difference = cv2.subtract(thresh2, thresh)
         blur_difference = cv2.GaussianBlur(difference, (41, 41), 0)
         new_thresh = cv2.threshold(blur_difference, 0, 255, cv2.THRESH_OTSU)[1]
+        cv2.imshow("red_thresh", new_thresh)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            exit()
         contours, _ = cv2.findContours(new_thresh.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         frogRectangles = self.contourFiltration(contours)
         return frogRectangles
@@ -90,6 +93,9 @@ class FrogCount:
         diff_blur = cv2.GaussianBlur(difference, (71, 71), 0)
         dilate_blur = cv2.dilate(diff_blur, None, iterations=6)
         newThreshold = cv2.threshold(dilate_blur, 0, 255, cv2.THRESH_OTSU)[1]
+        cv2.imshow("red_thresh", newThreshold)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            exit()
         contours, _ = cv2.findContours(newThreshold.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         frogRectangles = self.contourFiltration(contours)
         return frogRectangles

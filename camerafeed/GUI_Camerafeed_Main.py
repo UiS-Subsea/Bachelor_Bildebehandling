@@ -47,7 +47,7 @@ class ExecutionClass:
             
     def transect(self, frame):
         transect_frame, driving_data_packet, frog_counter = self.AutonomousTransect.run(frame.copy())
-        print(frog_counter)
+        print("Frogs found", frog_counter)
         self.show(transect_frame, "Transect")
         return driving_data_packet
             
@@ -71,8 +71,8 @@ if __name__ == "__main__":
     while True:
         frame = cam.get_frame()
         execution.show(frame)
-        cam.record_video(frame)
-        # execution.transect(frame)
+        # cam.record_video(frame)
+        execution.transect(frame)
         
     
     

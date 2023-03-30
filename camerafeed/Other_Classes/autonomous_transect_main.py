@@ -154,6 +154,6 @@ class AutonomousTransect:
 
     
 if __name__ == "__main__":
-    frame = cv2.imread("autonomus_handling/autonomous_transect/transect2.png")
+    frame = cv2.imread("camerafeed/Other_Classes/images/transect1.png")
     transect = AutonomousTransect()
     transect.run(frame)

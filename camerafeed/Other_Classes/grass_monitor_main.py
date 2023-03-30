@@ -123,26 +123,34 @@ class SeagrassMonitor:
     def __init__(self):
         self.done = False
         self.seagrass_counter = 0
+        self.growth = 0 
+        self.frame = None
+        self.prev_frame = None
+        self.next_frame = None
+        self.counter = 0
         
-        self.growth = 0 #if positive number, positive growth, opposite for negative values
+    def run(self, frame_under):
+        self.frame = frame_under
+        self.counter += 1
+        if self.counter == 1:
+            self.prev_frame = self.frame
+        if self.counter == 2:
+            self.next_frame = self.frame
+            squares_before = self.detect_squares(self.prev_frame)
+            squares_after = self.detect_squares(self.next_frame)
+            self.growth = self.calculate_seagrass(squares_before, squares_after) 
+            self.counter = 0
 
-
+        return self.growth
 
     def detect_squares(self, frame):
         squares = 0
         
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        #cv2.imshow("gray", gray)
-        blur = cv2.GaussianBlur(gray, (5, 5), 0) #slight blur
-        #cv2.imshow("blur", blur)
-        #canny = cv2.Canny(blur, 50, 200)
-        #cv2.imshow("canny", canny)
+        blur = cv2.GaussianBlur(gray, (5, 5), 0) 
         dilated = cv2.dilate(blur, None, iterations=3)
-        #cv2.imshow("dilated", dilated)
-        
         _, thresh = cv2.threshold(dilated, 127, 255, cv2.THRESH_BINARY)
-        #cv2.imshow("thresh", thresh)
-        #cv2.waitKey(0)
+        
         contours, _ = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         
         for contour in contours:
@@ -168,37 +176,19 @@ class SeagrassMonitor:
         #cv2.waitKey(0)
         return squares
     
-    def calculate_seagrass(self, img_before, img_after):
-        grass_difference = img_after - img_before
-        print("Grass before: ", img_before, "\nGrass after: ", img_after)
+    def calculate_seagrass(self, squares_before, squares_after):
+        grass_difference = squares_after - squares_before
+        print("Grass before: ", squares_before, "\nGrass after: ", squares_after)
         if grass_difference > 0:
             print("There is positive growth of seagrass")
-            print(f"Percent change: +{round(((self.seagrass_after / self.seagrass_before) - 1) * 100, 2)}%")
+            print(f"Percent change:")
         elif grass_difference < 0:
             print("There is negative growth of seagrass")
-            print(f"Percent change: {round(((self.seagrass_after / self.seagrass_before) - 1) * 100, 2)}%")
         else:
             print("There is no change in amount of seagrass")
             print("Percent change: 0% \n")
         return grass_difference
-
-
-    def update(self, frame=None):
-        if self.seagrass_counter == 0:
-            first_img = self.detect_squares(frame)
-            self.seagrass_counter += 1
-        if self.seagrass_counter == 1:
-            second_img = self.detect_squares(frame)
-            self.seagrass_counter += 1
-        if self.seagrass_counter == 2:
-            grass_diff = self.calculate_seagrass(first_img, second_img)
-            self.seagrass_counter = 0
-            self.done = True
-            return grass_diff
-            
-    
-
-
+                
 
 if __name__ == "__main__":
     #picture, amount = calculate_seagrass_percent("Example1_grey.png")

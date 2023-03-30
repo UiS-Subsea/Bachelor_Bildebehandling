@@ -1,6 +1,6 @@
-from Other_Classes.autonomous_transect_main import AutonomousTransect
-from Other_Classes.grass_monitor_main import SeagrassMonitor
-from Other_Classes.autonomous_docking_main import AutonomousDocking
+from Main_Classes.autonomous_transect_main import AutonomousTransect
+from Main_Classes.grass_monitor_main import SeagrassMonitor
+from Main_Classes.autonomous_docking_main import AutonomousDocking
 import cv2
 import multiprocessing as mp
 

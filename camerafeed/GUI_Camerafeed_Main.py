@@ -15,7 +15,7 @@ class Camera:
         return self.frame
     
     def setup_video(self, name):
-        self.videoresult = cv2.VideoWriter(f'{name}.avi', cv2.VideoWriter_fourcc(*'MJPG'),10, (int(self.cam.get(3)), int(self.cam.get(4))))
+        self.videoresult = cv2.VideoWriter(f'camerafeed/output/{name}.avi', cv2.VideoWriter_fourcc(*'MJPG'),10, (int(self.cam.get(3)), int(self.cam.get(4))))
 
 
     # Run this to start recording, and do a keyboard interrupt (ctrl + c) to stop recording
@@ -41,6 +41,9 @@ class ExecutionClass:
         if cv2.waitKey(1) == ord("q"):
             cv2.destroyAllWindows()
             raise KeyboardInterrupt
+        
+    def save_image(self):
+        cv2.imwrite("camerafeed/output/output_image.jpg", self.frame)
             
     def transect(self, frame):
         transect_frame, driving_data_packet = self.AutonomousTransect.run(frame.copy())
@@ -50,7 +53,6 @@ class ExecutionClass:
     def seagrass(self, frame):
         growth = self.Seagrass.run(frame.copy())
         return growth
-        # print(growth)
         
         
     def docking(self, frame):
@@ -65,13 +67,10 @@ class ExecutionClass:
 if __name__ == "__main__":
     cam = Camera()
     execution = ExecutionClass()
-    
     while True:
         frame = cam.get_frame()
-        for i in range(10000):
-            if i%4999 == 0:
-                execution.seagrass(frame)
         execution.show(frame)
+        cam.record_video(frame)
         # execution.transect(frame)
         
     

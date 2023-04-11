@@ -30,17 +30,20 @@ def regulate_position(displacement_x, displacement_y):
 class AutonomousDocking:
     def __init__(self):
         self.driving_data = [40, [0, 0, 0, 0, 0, 0, 0, 0]]
-        self.frame = None
+        self.frameL = None
+        self.down_frame = None
         self.draw_grouts = False
         self.draw_grout_boxes = False
         
-    def run(self, front_frame, down_frame):
-        self.frame = front_frame
+    def run(self, down_frame, front_frame_L = None, front_frame_R = None):
+        self.frameL = front_frame_L
+        self.frameR = front_frame_R
         self.down_frame = down_frame
         self.update()
         self.rotation_commands()
         data = self.get_driving_data()
-        return self.frame, self.down_frame, data
+        print(data)
+        return self.frameL, self.down_frame, data
         
     def get_driving_data(self):
         data = self.driving_data.copy()
@@ -51,17 +54,17 @@ class AutonomousDocking:
         # create a range for isolating only red
         lower_bound, upper_bound = (10, 10, 70), (70, 40, 255)
         #remove details from image
-        blurred = cv2.GaussianBlur(self.frame, (11, 13), 0) 
+        blurred = cv2.GaussianBlur(self.frameL, (11, 13), 0) 
         # creating a mask using the inRange() function and the low, high range, then dilating it
         mask1 = cv2.inRange(blurred, lower_bound, upper_bound)
         dilated = cv2.dilate(mask1, None, iterations=6)
-        red_isolated = cv2.bitwise_and(self.frame, self.frame, mask=dilated)
+        red_isolated = cv2.bitwise_and(self.frameL, self.frameL, mask=dilated)
         canny = cv2.Canny(red_isolated, 100, 200)
         # use findContours to get a list of all contoures
         contours, _ = cv2.findContours(canny, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         # there may be a lot of noise in the image, to find the correct contoure, we loop through the list of contoures
         red_center = (0, 0), 0
-        print(contours)
+        # print(contours)
         for c in contours:
             (x, y), radius = cv2.minEnclosingCircle(c)
             if radius > red_center[1]:
@@ -70,20 +73,22 @@ class AutonomousDocking:
         center_point = (int(red_center[0][0]), int(red_center[0][1]))
         radius = int(red_center[1])
         # draw a circle around the red dot
-        cv2.circle(self.frame, center_point, radius, (0, 255, 0), 2)
+        cv2.circle(self.frameL, center_point, radius, (0, 255, 0), 2)
         return center_point, radius
         
     def update(self):
-        frame_width = self.frame.shape[1]
-        frame_height = self.frame.shape[0]
+        frame_width = self.frameL.shape[1]
+        frame_height = self.frameL.shape[0]
         
         frame_centerpoint = (frame_width / 2, frame_height / 2)
         red_centerpoint, red_radius = self.find_red()
         
         #center = (0, 0) and r = 0 are default values, meaning no red conture is found
         if red_centerpoint == (0, 0) and red_radius == 0: 
-            print("No docking station found!")
+            # print("No docking station found!")
             return "No docking station found!"
+        # else:
+            # print("Docking station found!", red_centerpoint, red_radius)
         
         width_diff, height_diff = frame_centerpoint[0] - red_centerpoint[0], frame_centerpoint[1] - red_centerpoint[1]
         
@@ -100,7 +105,7 @@ class AutonomousDocking:
         grouts = cv2.inRange(self.down_frame, lower_bound, upper_bound)
         canny = cv2.Canny(grouts, 100, 200)
         blurred = cv2.GaussianBlur(canny, (11, 13), 0)
-        grout_contours, _ = cv2.findContours(blurred, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        grout_contours, _ = cv2.findContours(blurred,cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         if self.draw_grouts:
             cv2.drawContours(self.down_frame, grout_contours, -1, (0, 255, 0), 3)
             if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -158,8 +163,16 @@ class AutonomousDocking:
         
         
 if __name__ == "__main__":
-    start = time.perf_counter()
     a = AutonomousDocking()
-    frame = cv2.imread("camerafeed/Other_Classes/images/transect1.png")
-    a.run(frame, frame.copy())
-    print(time.perf_counter() - start)
+    frame_down = cv2.imread("camerafeed/Main_Classes/images/vann2.jpg")
+    cam = cv2.VideoCapture(0)
+    while True:
+        _, frame = cam.read()
+        a.run(down_frame=frame_down, front_frame_L=frame)
+        cv2.imshow("Front Cam", a.frameL)
+        cv2.imshow("Down Cam", a.down_frame)
+        
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    cam.release()
+    cv2.destroyAllWindows()

@@ -68,7 +68,7 @@ def test_func(img_path):
     
     kernel1 = np.ones((2,3),np.uint8)
     kernel2 = np.ones((3,3),np.uint8)
-    test = cv2.erode(test, kernel1, iterations=3)
+    test = cv2.erode(test, kernel1, iterations=2)
     test = cv2.dilate(test, kernel2, iterations=12)
     cv2.imshow("Grouts", np.hstack([horizontal, vertical]))
     cv2.imshow("Input", output)

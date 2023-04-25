@@ -45,16 +45,18 @@ def find_center_of_red(img):
 
     # cv2.imshow("mask1", mask1)
     # cv2.imshow("red_isolated", red_isolated)
-    cv2.imshow("Canny", canny)
-    cv2.imshow("img", img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # cv2.imshow("Canny", canny)
+    # cv2.imshow("img", img)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
     return center, radius #center is a tuple of two integers: (x, y), raduis is just an integer
 
 
 
 if __name__ == "__main__":
-    img = cv2.imread('autonomous_docking/images/pool_test1.png')
+    start = time.perf_counter()
+    img = cv2.imread('autonomous_docking\older_versions\docking_1080p.png')
     red_center, raduius = find_center_of_red(img)
-    print(red_center, raduius)
+    print(time.perf_counter() - start)
+    #print(red_center, raduius)

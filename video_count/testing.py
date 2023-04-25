@@ -1,6 +1,5 @@
-import multiprocessing
-from multiprocessing import Queue
-
-q = multiprocessing.Queue()
-q.put("hello")
-print(q[0])
+list = [1,2,3,4,5,6,7,8,9,10]
+list2 = []
+for num in list:
+    list2.append(num)
+print(list2)

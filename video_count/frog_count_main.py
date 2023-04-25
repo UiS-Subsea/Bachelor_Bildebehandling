@@ -16,16 +16,15 @@ class FrogCount:
         self.currFrogs = []
         self.prevFrogs = []
         self.frog_counter = 0
-        self.detection_counter_threshold = 10
+        self.detection_counter_threshold = 5
         self.frame = None
         self.fgbg = cv2.createBackgroundSubtractorKNN()
         self.kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
         
-        self.check_previous_algo = "BASIC"
+        self.check_previous_algo = "ADVANCED"
 
     #takes in frame  
     def update(self, image, drawImage = False): # Launches the two detection methods
-        new = self.frogdetectionNew(image)
         self.frame = image
         rectanglesNoRed = self.frogDetectionNoRed(image)
         rectanglesNoGrout = self.frogDetectionNoGrout(image)
@@ -38,12 +37,13 @@ class FrogCount:
                 cv2.rectangle(image, (x,y), (x+w, y+h), (0, 255, 0), 2)
             cv2.imshow("Image", image)
 
-            
-        
+        frogRectangles = []
         for rectangle in filteredRectangles:
-            self.currFrogs.append(Frog(rectangle))
+            frogRectangles.append(Frog(rectangle))
+        
+        self.currFrogs = frogRectangles
             
-        self.current_frogs = filteredRectangles
+        self.current_frogs = frogRectangles
         
         if self.check_previous_algo == "BASIC":
             self.checkPreviousFrogsBasic()
@@ -60,22 +60,29 @@ class FrogCount:
         FilteredFrogs, _ = self.rectangleOverlapFilter(allFrogs)
         numRemovedFrogs = numAllFrogs - len(FilteredFrogs)
         self.frog_counter += numFrogsDetected - numRemovedFrogs
-
+        print("Frogs: " + str(self.frog_counter))
+        print("added: " + str(numFrogsDetected - numRemovedFrogs))
         self.previous_frogs = self.current_frogs
 
     def checkPreviousFrogsAdvanced(self):
-        allFrogs = self.current_frogs + self.previous_frogs
-        _, OverlapPairs = self.rectangleOverlapFilter(allFrogs.copy())
+        allFrogs = self.currFrogs + self.prevFrogs
+        theRectangles = []
+        for frog in allFrogs:
+            theRectangles.append(frog.rectangle)
+        OverlapPairs = self.rectangleOverlapFilterNoRemove(theRectangles.copy())
         for OverlapPair in OverlapPairs:
             # OverlapPair = touple of two indexes, of rectangles that overlap
             if allFrogs[OverlapPair[0]].detectionCounter <= allFrogs[OverlapPair[1]].detectionCounter:
+                
                 allFrogs[OverlapPair[0]].detectionCounter = allFrogs[OverlapPair[1]].detectionCounter + 1
+                print("ok1, new detCount: " + str(allFrogs[OverlapPair[0]].detectionCounter))
 
         
-        self.prevFrogs = self.allFrogs[0:len(self.currFrogs)]
+        self.prevFrogs = self.currFrogs
         for frog in self.prevFrogs:
             if frog.detectionCounter == self.detection_counter_threshold:
                 self.frog_counter += 1
+                print("Frogs: " + str(self.frog_counter))
         self.currFrogs = []
         
     def frogDetectionNoRed(self, image):
@@ -102,20 +109,6 @@ class FrogCount:
         contours, _ = cv2.findContours(newThreshold.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         frogRectangles = self.contourFiltration(contours)
         return frogRectangles
-
-
-    
-    def frogdetectionNew(self, image):
-        fgmask = self.fgbg.apply(image)
-        newmask = cv2.morphologyEx(fgmask, cv2.MORPH_OPEN, self.kernel)
-
-        cv2.imshow("mask", newmask)
-        cv2.imshow("new_mask", fgmask)
-        cv2.waitKey(1)
-
-
-
-
 
     
     def contourFiltration(self, contours, epsilonValue = 0.03, noise_threshhold_lower = 40, noise_threshhold_upper = 300): # Finds frogs using various filters
@@ -162,6 +155,30 @@ class FrogCount:
                         break
                     
         return rectangles, overlappedRectsPairs
+    
+    def rectangleOverlapFilterNoRemove(self, rectangles): # Filters out rectangles that overlap O(n^2)
+        overlappedRectsPairs = []
+        if len(rectangles) >= 2:
+            n = 0
+            for rectangle in rectangles:
+                n += 1
+                for index in range(n, len(rectangles)):
+                    x,y,w,h = rectangle
+                    x2,y2,w2,h2 = rectangles[index]
+                    
+                    # Checks if rectangles overlap in x and y axis
+                    # From https://www.geeksforgeeks.org/find-two-rectangles-overlap/
+                    if x + w < x2 or x2 + w2 < x:
+                        continue
+                    
+                    elif y + h < y2 or y2 + h2 < y:
+                        continue
+                    
+                    else:
+                        overlappedRectsPairs.append((n, index))
+                        break
+                    
+        return overlappedRectsPairs
 
 def count_frogs_main(video_stream, show_video = False):
     tracker = EuclideanDistTracker()

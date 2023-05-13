@@ -49,9 +49,10 @@ def find_center_of_red(img, low_range=(0, 0, 50), high_range=(30, 30, 100)):
     radius = int(red_center[1])
     cv2.circle(img, center, radius, (0, 255, 0), 2)
 
-    cv2.imshow("dilated", dilated)
+    # cv2.imshow("dilated", dilated)
     cv2.imshow("img", img)
-    cv2.imshow("canny", canny)
+    cv2.imwrite("depth_testing//depth_test1.png", img)
+    # cv2.imshow("canny", canny)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 

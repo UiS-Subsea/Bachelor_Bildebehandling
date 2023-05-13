@@ -53,19 +53,16 @@ def stereo_calibration(mtx1, dist1, mtx2, dist2, folder1, folder2):
             cv2.drawChessboardCorners(frame1, (rows, cols), corners1, ret1)
             cv2.drawChessboardCorners(frame2, (rows, cols), corners2, ret2)
             
-            # cv2.imshow("frame2", frame1)
-            # cv2.imshow("frame3", frame2)
-            # cv2.waitKey(0)
+            cv2.imshow("frame2", frame1)
+            cv2.imshow("frame3", frame2)
+            cv2.waitKey(0)
             
             objpoints.append(objp)
             imgpoints1.append(corners1)
             imgpoints2.append(corners2)
     
     stereo_calib_flags = cv2.CALIB_FIX_INTRINSIC
+    print(imgpoints1)
     ret, cam1_matrix, dist1, cam2_matrix, dist2, rota, transform, ematrix, fmatrix = cv2.stereoCalibrate(objpoints, imgpoints1, imgpoints2, mtx1, dist1, mtx2, dist2, (width, height), flags=stereo_calib_flags)
     
     return rota, transform
-
-    
-
-    

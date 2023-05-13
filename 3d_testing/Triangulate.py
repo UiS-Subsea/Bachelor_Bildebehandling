@@ -21,9 +21,9 @@ def triangulate(mtx1,mtx2,R,T):
     gray1 = cv2.equalizeHist(gray1)
     gray2 = cv2.equalizeHist(gray2)
     
-    # cv2.imshow("After hist equalize", gray1)
-    # cv2.imshow("After hist equalize 2", gray2)
-    # cv2.waitKey(0)
+    cv2.imshow("After hist equalize", gray1)
+    cv2.imshow("After hist equalize 2", gray2)
+    cv2.waitKey(0)
     
     gray1 = cv2.GaussianBlur(gray1, (5, 5), 0)
     gray2 = cv2.GaussianBlur(gray2, (5, 5), 0)
@@ -47,7 +47,7 @@ def triangulate(mtx1,mtx2,R,T):
     # print("No of keypoints on img2: ", len(kp2))
     # print("kp1 type:", type(kp1), "values: ", kp1)
     # print("BIG TEST VALUE: ", kp1[0].pt)
-    bf = cv2.BFMatcher()
+    bf = cv2.BFMatcher.create()
     
     matches = bf.knnMatch(des1, des2, k=2)
     print("Matches: ", len(matches))
@@ -59,8 +59,9 @@ def triangulate(mtx1,mtx2,R,T):
             good_matches.append(m)
     img_matches = cv2.drawMatchesKnn(img1, kp1, img2, kp2, matches[:], None)
     resized = cv2.resize(img_matches, (1280, 480))
-    plt.imshow(resized)
-    plt.show()
+    cv2.imshow("mathes", img_matches)
+    cv2.imwrite("3d_testing\matches.png", img_matches)
+    cv2.waitKey(0)
     
     # cv2.destroyAllWindows()
     print("Good matches: ", len(good_matches))
@@ -89,5 +90,7 @@ def triangulate(mtx1,mtx2,R,T):
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')
+    print(points_3d_normalized[:, 2])
     ax.scatter3D(points_3d_normalized[:, 0], points_3d_normalized[:,1], points_3d_normalized[:, 2], cmap='Greens')
+
     plt.show()

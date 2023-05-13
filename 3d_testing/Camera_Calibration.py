@@ -36,8 +36,9 @@ def calibrate_camera(image_folder):
         if ret:
             conv_size = (5,5)
             corners = cv2.cornerSubPix(gray, corners, conv_size, (-1,-1), criteria)
-            cv2.drawChessboardCorners(frame, (rows, cols), corners, ret)
+            # cv2.drawChessboardCorners(frame, (rows, cols), corners, ret)
             # cv2.imshow("name", frame)
+            # cv2.imwrite("3d_testing\Stereo1_Pics\chessboard_1.png", frame)
             # cv2.waitKey(0)
             
             objpoints.append(objp)

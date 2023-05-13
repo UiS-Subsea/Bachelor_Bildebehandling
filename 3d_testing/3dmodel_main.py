@@ -7,7 +7,7 @@ from Triangulate import triangulate
 
 if __name__ == "__main__":
     # mtx1, dist1 = calibrate_camera("3d_testing/Stereo1_Pics/*")
-    # mtx2, dist2 = calibrate_camera("3d_testing/Stereo2_Pics/*")
+    # mtx2, dist2 = calibrate_camera("3d_testing/Stereo2_Pics/*")qq
     # np.savez("3d_testing//cam1_calibration.npz", mtx=mtx1, dist=dist1)
     # np.savez("3d_testing//cam2_calibration.npz", mtx=mtx2, dist=dist2)
 

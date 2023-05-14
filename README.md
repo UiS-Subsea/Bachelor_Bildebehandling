@@ -1,5 +1,8 @@
 # Bachelor
-Bachelor Subsea bildebehandling w/ Filip, Daniel
+Bachelor Subsea bildebehandling w/ Filip, Daniel and chiran
+
+The final classes are within the camerafeed folder in the main branch. All of the testing and developemnt was done in the designated branches.
+
 
 To use the virtual environment:
 

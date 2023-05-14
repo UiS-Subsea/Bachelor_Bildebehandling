@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import time
-from Main_Classes.frog_count_main import FrogCount
 
 # What to tweak for water test:
 # 1. cv2.inRange() lower and upper range
@@ -11,9 +10,8 @@ from Main_Classes.frog_count_main import FrogCount
 class AutonomousTransect:
     def __init__(self):
         self.canStabilize = False
-        self.driving_data = [40, [0, 0, 0, 0, 0, 0, 0, 0]]
+        self.driving_data = [0, 0, 0, 0, 0, 0, 0, 0]
         self.frame = None
-        self.frog_count = FrogCount()
 
     #takes in frame, finds all the contours of objects with dark blue color
     #returns angle between             
@@ -21,16 +19,15 @@ class AutonomousTransect:
         self.frame = frame
         self.update()
         data = self.get_driving_data()
-        frog_counter = self.frog_count.update(frame)
-        return self.frame, data, frog_counter
+        return self.frame, data
         
     def update(self):
-        self.autonomous_transect_maneuver()
-        self.doStabilize()
+        self.stabilize_angle()
+        self.stabilize_alignment()
         
     def get_driving_data(self):
         data = self.driving_data.copy()
-        self.driving_data = [40, [0, 0, 0, 0, 0, 0, 0, 0]]
+        self.driving_data = [0, 0, 0, 0, 0, 0, 0, 0]
         return data
 
     def get_angle_between_pipes(self, pipe1, pipe2):
@@ -71,16 +68,16 @@ class AutonomousTransect:
             return pipes
             
         else:
-            print("No pipes found")
-            return "SKIP" # Skip frame, harmless result 
+            # print("No pipes found")
+            return "SKIP"
       
         
     def find_dark_blue_contours(self):
-        low_blue_range = (70, 0, 0) #b, g, r
+        low_blue_range = (0, 0, 0) #b, g, r, TODO should mabye be (70, 0, 0)
         high_blue_range = (255, 60, 60)
     
         transect_pipe_mask = cv2.inRange(self.frame, low_blue_range, high_blue_range)
-        pipe_contours, _ = cv2.findContours(transect_pipe_mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        pipe_contours, _ = cv2.findContours(transect_pipe_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
         # cv2.drawContours(frame, pipe_contours, -1, (0, 255, 0), 5)
         # cv2.imshow("contours", frame)
@@ -91,31 +88,28 @@ class AutonomousTransect:
     
     # driving packet: [id, [x, y, z, r, 0, 0, 0, 0]]
     
-    def autonomous_transect_maneuver(self):
+    def stabilize_angle(self):
         pipes = self.find_pipes()
         if pipes == "SKIP":
-            return "SKIP"
+            return
+            
         
         transect_angle = self.get_angle_between_pipes(pipes[0], pipes[1])
         
         if transect_angle < -2:
-            print("Turn left")
-            self.driving_data = [40, [0, 0, 0, -10, 0, 0, 0, 0]]
+            # print("Turn left")
+            self.driving_data = [0, 0, 0, -10, 0, 0, 0, 0]
     
         elif transect_angle > 2:
-            self.driving_data = [40, [0, 0, 0, 10, 0, 0, 0, 0]]
-            print("Turn right")
+            self.driving_data = [0, 0, 0, 10, 0, 0, 0, 0]
+            # print("Turn right")
             
         else:
-            print("Go forward")
+            # print("Clear for stabilization")
             self.canStabilize = True
-            self.driving_data = [40, [0, 10, 0, 0, 0, 0, 0, 0]]
-
-
-        #call go center function
         
 
-    def doStabilize(self):
+    def stabilize_alignment(self):
         if self.canStabilize:
             pipes = self.find_pipes()
             if pipes == "SKIP":
@@ -130,7 +124,7 @@ class AutonomousTransect:
                 leftPipe = pipes[1]
                 rightPipe = pipes[0]
             distanceFromLeftPipe = leftPipe[0][0]
-            distanceFromRightPipe = frame.shape[1] - rightPipe[0][0]
+            distanceFromRightPipe = self.frame.shape[1] - rightPipe[0][0]
             ratio = distanceFromLeftPipe / distanceFromRightPipe # ratio = 1 means perfect
             
             # print("Distance from left pipe: ", distanceFromLeftPipe)
@@ -138,20 +132,26 @@ class AutonomousTransect:
             # print("Ratio: ", ratio)
             
             if 0.95 > ratio:
-                self.driving_data = [40, [-10, 0, 0, 0, 0, 0, 0, 0]]
-                print("Move to left")
+                self.driving_data = [-10, 0, 0, 0, 0, 0, 0, 0]
+                # print("Move to left")
                 
             elif 1.05 < ratio:
-                print("Move to right")
-                self.driving_data = [40, [10, 0, 0, 0, 0, 0, 0, 0]]
+                # print("Move to right")
+                self.driving_data = [10, 0, 0, 0, 0, 0, 0, 0]
                 
             else:
-                print("Go forward")
-                self.driving_data = [40, [0, 10, 0, 0, 0, 0, 0, 0]]
+                # print("Go forward")
+                self.driving_data = [0, 10, 0, 0, 0, 0, 0, 0]
+
+            self.canStabilize = False
+            return
+            
         else:
-            # print("Can't stabilize yet")
-            pass
+            # print("Waiting for ROV to stabilize angle")
+            return
          
+
+
 
     
 if __name__ == "__main__":
